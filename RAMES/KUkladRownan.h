@@ -11,19 +11,24 @@ class KUkladRownan
 private:
 	KMacierz* A; //macierz wspolczynnikow
 	KWektor* Y; // wektor wyrazow wolnych
-	KWektor* LiczXgradientySprzezone();
+	KWektor* X; // wektor niewiadomych
+
+	KWektor* RozwiazGradientamiSprzezonymi();
 
 public:
-	KWektor* X; // wektor niewiadomych
 
 	KUkladRownan();
 	~KUkladRownan();
 
+	KMacierz* PobierzA();
+	KWektor* PobierzY();
+	KWektor* PobierzX();
+
 	void UstawA(KMacierz* iA);
 	void UstawY(KWektor* iY);
 
-	KWektor* LiczX(const char* imetoda);
-	KWektor* LiczX(KMacierz* iA, KWektor* iY, const char* imetoda);
+	KWektor* Rozwiaz(const char* imetoda);
+	KWektor* Rozwiaz(KMacierz* iA, KWektor* iY, const char* imetoda);
 
 
 };

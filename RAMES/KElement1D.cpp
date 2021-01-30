@@ -1,38 +1,43 @@
 #include "pch.h"
 
 #include "KElement1D.h"
-#include "KWezel1D.h"
 
-KElement1D::KElement1D(unsigned inumer) {
-	numer = inumer;
-	lewy = NULL;
-	prawy = NULL;
+using namespace std;
+
+short KElement1D::n = 2;
+
+KElement1D::KElement1D() {
+	k = 0;
+	f = 0;
+	numer = 0;
 }
 
-KElement1D::KElement1D(unsigned inumer, KWezel1D* ilewy, KWezel1D* iprawy, float ik) {
+KElement1D::KElement1D(unsigned inumer, KWezel1D* ilewy, KWezel1D* iprawy, float ik, float iff) {
 	numer = inumer;
-	lewy = ilewy;
-	prawy = iprawy;
 	k = ik;
-}
-KElement1D::~KElement1D() {
-
-}
-void KElement1D::UstawLewy(KWezel1D* ilewy) {
-	lewy = ilewy;
-}
-void KElement1D::UstawPrawy(KWezel1D* iprawy) {
-	prawy = iprawy;
+	f = iff;
+	wezly_e.push_back(ilewy);
+	wezly_e.push_back(iprawy);
 }
 
-KWezel1D* KElement1D::PobierzLewy()
+KElement1D::~KElement1D() 
 {
-	return lewy;
+
 }
 
-KWezel1D* KElement1D::PobierzPrawy()
+short int KElement1D::PobierzLiczbeWezlow()
 {
-	return prawy;
+	return n;
+}
+
+void KElement1D::UstawLiczbeWezlow(short int in)
+{
+	n = in;
+}
+
+std::vector<KWezel1D*>* KElement1D::PobierzWezly()
+{
+	return &wezly_e;
 }
 
 int KElement1D::PobierzNumer()
@@ -40,6 +45,21 @@ int KElement1D::PobierzNumer()
 	return numer;
 }
 
-float KElement1D::PobierzTemperature() {
-	return (lewy->PobierzTemperature() + prawy->PobierzTemperature()) / 2;
+float KElement1D::Pobierzh()
+{
+	return (*(wezly_e.end() - 1))->PobierzX() - (*(wezly_e.begin()))->PobierzX();
+}
+
+float KElement1D::Pobierzk()
+{
+	return k;
+}
+
+float KElement1D::Pobierzf()
+{
+	return f;
+}
+
+float KElement1D::PobierzT() {
+	return 0;
 }

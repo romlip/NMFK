@@ -18,6 +18,21 @@ KUkladRownan::~KUkladRownan()
 	if (X) delete X;
 }
 
+KMacierz* KUkladRownan::PobierzA()
+{
+	return A;
+}
+
+KWektor* KUkladRownan::PobierzY()
+{
+	return Y;
+}
+
+KWektor* KUkladRownan::PobierzX()
+{
+	return X;
+}
+
 void KUkladRownan::UstawA(KMacierz* iA)
 {
 	A = iA;
@@ -28,7 +43,7 @@ void KUkladRownan::UstawY(KWektor* iY)
 	Y = iY;
 }
 
-KWektor* KUkladRownan::LiczX(const char* imetoda)
+KWektor* KUkladRownan::Rozwiaz(const char* imetoda)
 {
 	if (!A || !Y)
 	{
@@ -37,17 +52,17 @@ KWektor* KUkladRownan::LiczX(const char* imetoda)
 	}
 
 	if (imetoda == "gradienty_sprzezone")
-		return LiczXgradientySprzezone();
+		return RozwiazGradientamiSprzezonymi();
 }
 
-KWektor* KUkladRownan::LiczX(KMacierz* iA, KWektor* iY, const char* imetoda)
+KWektor* KUkladRownan::Rozwiaz(KMacierz* iA, KWektor* iY, const char* imetoda)
 {
 	UstawA(iA);
 	UstawY(iY);
-	return LiczX(imetoda);
+	return Rozwiaz(imetoda);
 }
 
-KWektor* KUkladRownan::LiczXgradientySprzezone()
+KWektor* KUkladRownan::RozwiazGradientamiSprzezonymi()
 {
 	// cialo liczace uklad gradyjentami spszenrzonymi
 

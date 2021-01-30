@@ -25,7 +25,7 @@
 IMPLEMENT_DYNCREATE(CRAMESDoc, CDocument)
 
 BEGIN_MESSAGE_MAP(CRAMESDoc, CDocument)
-	ON_COMMAND(ID_STRUKTURA_WCZYTAJ, &CRAMESDoc::OnStrukturaWczytaj)
+	ON_COMMAND(ID_DANE_WCZYTAJ, &CRAMESDoc::OnDaneWczytaj)
 	ON_COMMAND(ID_WYNIKI_ZAPISZ, &CRAMESDoc::OnWynikiZapisz)
 	ON_COMMAND(ID_OBLICZENIA_WYKONAJ, &CRAMESDoc::OnObliczeniaWykonaj)
 END_MESSAGE_MAP()
@@ -38,6 +38,9 @@ CRAMESDoc::CRAMESDoc() noexcept
 	// TODO: add one-time construction code here
 	dane = new KDane();
 	plik = new KPlik();
+	obliczenia = new KObliczenia();
+
+	KMacierz mojamacierz;
 }
 
 CRAMESDoc::~CRAMESDoc()
@@ -188,12 +191,12 @@ void CRAMESDoc::OnWynikiZapisz()
 
 	//	
 	//}
-	plik->ZapiszWynik("wyniki.txt", dane);
+	plik->ZapiszWynik("wyniki.txt", dane, obliczenia);
 }
 
 
 void CRAMESDoc::OnObliczeniaWykonaj()
 {
-	obliczenia->Licz(dane);
+	wektorWynikowy = obliczenia->Licz(dane);
 	// TODO: Add your command handler code here
 }

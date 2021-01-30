@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "KPlik.h"
+#include "KMacierz.h"
+#include "KWektor.h"
 
 #include <iostream>
 #include <fstream>
@@ -80,7 +82,7 @@ void KPlik::CzytajWarunkiI(ifstream& plik, KDane* dane)
 		stringstream sline(line);
 		sline >> x >> T;
 		strukt_warunekI warunek = { x, T };
-		dane->warunkiI.push_back(warunek);
+		dane->DodajWarunekI(warunek);
 	}
 }
 
@@ -96,7 +98,7 @@ void KPlik::CzytajZrodlaPunktowe(ifstream& plik, KDane* dane)
 		stringstream sline(line);
 		sline >> x >> f;
 		strukt_zrodlo_punktowe zrodlo = { x, f };
-		dane->zrodla_punktowe.push_back(zrodlo);
+		dane->DodajZrodloPunktowe(zrodlo);
 	}
 }
 
@@ -104,19 +106,19 @@ void KPlik::CzytajStrukture(ifstream& plik, KDane* dane)
 {
 	string line;
 	unsigned _nr;
-	float _xl, _xp, _k;
+	float _xl, _xp, _k, _f;
 
 	while (getline(plik, line) && line.find(start) == string::npos && plik.good()) {} //szukamy START
 
 	while (getline(plik, line) && line.find(koniec) == string::npos && plik.good()) // czytamy warunki az do KONIEC
 	{
 		stringstream sline(line);
-		sline >> _nr >> _xl >> _xp >> _k;
-		dane->siatka->DodajElement(_nr, _xl, _xp, _k);
+		sline >> _nr >> _xl >> _xp >> _k >> _f;
+		dane->siatka->DodajElement(_nr, _xl, _xp, _k, _f);
 	}
 }
 
-void KPlik::ZapiszWynik(char* inazwaPliku, KDane* dane)
+void KPlik::ZapiszWynik(char* inazwaPliku, KDane* dane, KObliczenia* obliczenia)
 {
 	ofstream plik(inazwaPliku, ios::out);
 	if (plik.good())
@@ -130,7 +132,13 @@ void KPlik::ZapiszWynik(char* inazwaPliku, KDane* dane)
 
 		for (auto it_elementy = dane->siatka->elementy.begin(); it_elementy != dane->siatka->elementy.end(); ++it_elementy)
 		{
-			plik << it_elementy->PobierzNumer() <<"\t"<<it_elementy->PobierzLewy()->PobierzX() << "\t" << it_elementy->PobierzPrawy()->PobierzX() << "\n";
+			plik << it_elementy->PobierzNumer() << "\t";
+			for (auto it_wezly = it_elementy->PobierzWezly()->begin(); it_wezly != it_elementy->PobierzWezly()->end(); ++it_wezly)
+				plik << (*it_wezly)->PobierzX() << "\t";
+			plik << "\n";
 		}
 	}
+
+	KMacierz* K = obliczenia->PobierzGlobalnaMacierzSztywnosci();
+	K->Wypisz(plik);
 }

@@ -3,17 +3,17 @@
 class KWezel1D
 {
 private:
-	int numer;
+	unsigned numer;
 	float x; //wspolrzedna x wezla
 	float temperatura; //K
 
 public:
 	KWezel1D();
-	KWezel1D(int inumer, float ix);
+	KWezel1D(unsigned inumer, float ix);
 
 	void UstawTemperature(float);
 
-	int PobierzNumer();
+	unsigned PobierzNumer();
 	float PobierzX();
 	float PobierzTemperature();
 };

@@ -191,9 +191,11 @@
     <ClInclude Include="KObliczenia.h" />
     <ClInclude Include="KPlik.h" />
     <ClInclude Include="KSiatka.h" />
+    <ClInclude Include="KUkladRownan.h" />
     <ClInclude Include="KWektor.h" />
     <ClInclude Include="KWezel1D.h" />
     <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="mes.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="RAMES.h" />
     <ClInclude Include="RAMESDoc.h" />
@@ -209,9 +211,11 @@
     <ClCompile Include="KObliczenia.cpp" />
     <ClCompile Include="KPlik.cpp" />
     <ClCompile Include="KSiatka.cpp" />
+    <ClCompile Include="KUkladRownan.cpp" />
     <ClCompile Include="KWektor.cpp" />
     <ClCompile Include="KWezel1D.cpp" />
     <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="mes.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

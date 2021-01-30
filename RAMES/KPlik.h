@@ -1,7 +1,7 @@
 #pragma once
 
 #include "KDane.h"
-
+#include "KObliczenia.h"
 
 class KPlik
 {
@@ -22,6 +22,6 @@ public:
 	void CzytajWarunkiI(std::ifstream& plik, KDane* dane);
 	void CzytajZrodlaPunktowe(std::ifstream& plik, KDane* dane);
 	void CzytajStrukture(std::ifstream& plik, KDane* dane);
-	void ZapiszWynik(char* inazwaPliku, KDane* dane);
+	void ZapiszWynik(char* inazwaPliku, KDane* dane, KObliczenia* obliczenia);
 };
 

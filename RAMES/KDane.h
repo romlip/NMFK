@@ -24,6 +24,12 @@ private:
 public:
 	friend class KPlik;
 	KDane();
+	~KDane();
+
+	void DodajWarunekI(strukt_warunekI warunekI);
+	void DodajZrodloPunktowe(strukt_zrodlo_punktowe zrodlo);
+
+	KSiatka* PobierzSiatke();
 
 };
 
