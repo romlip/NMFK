@@ -11,6 +11,13 @@ KUkladRownan::KUkladRownan()
 	X = nullptr;
 }
 
+KUkladRownan::KUkladRownan(unsigned ili_wezlow)
+{
+	A = new KMacierz(ili_wezlow);
+	Y = new KWektor(ili_wezlow);
+	X = new KWektor(ili_wezlow);
+}
+
 KUkladRownan::~KUkladRownan()
 {
 	if (A) delete A;

@@ -18,6 +18,7 @@ private:
 public:
 
 	KUkladRownan();
+	KUkladRownan(unsigned ili_wezlow);
 	~KUkladRownan();
 
 	KMacierz* PobierzA();

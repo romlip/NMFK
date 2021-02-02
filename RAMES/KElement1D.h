@@ -11,7 +11,7 @@ private:
 	unsigned numer;
 	float k; // wspolczynnik przewodnosci
 	float f; // rozciagle zrodlo pola
-	std::vector<KWezel1D*> wezly_e;
+	std::vector<KWezel1D*> vpWezly;
 
 public:
 	KElement1D();
@@ -19,9 +19,14 @@ public:
 	~KElement1D();
 
 	static void UstawLiczbeWezlow(short int in);
+
+	void UstawNumer(unsigned inumer);
+	void UstawWezel(int i, KWezel1D* wezel);
 	static short int PobierzLiczbeWezlow();
 
+
 	std::vector<KWezel1D*>* PobierzWezly();
+	KWezel1D* PobierzWezel(int ity_wezel);
 	int PobierzNumer();
 	float Pobierzh();
 	float Pobierzk();

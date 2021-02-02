@@ -14,9 +14,13 @@ public:
 	KMacierz();
 	KMacierz(int in);
 	KMacierz(int im, int in);
+	KMacierz(unsigned rozmiar, const float* tablica);
 	~KMacierz();
 
 	void Zeros();
+	unsigned DajM();
+	unsigned DajN();
+	float DajIJ(int i, int j);
 	void Wypisz(std::ostream &out);
 
 	float& operator()(unsigned i, unsigned j);

@@ -5,18 +5,24 @@
 /////////////////////////////////////////////
 // Tworzy wektor in-elementowy wypelniony zerami
 
-KWektor::KWektor()
+KWektor::KWektor(): KMacierz()
 {
 }
 
 KWektor::KWektor(unsigned in): KMacierz(m, in)
 {
-    n = in;
+}
+
+KWektor::KWektor(unsigned in, const float* tablica): KMacierz(m, in)
+{
+    for (unsigned i(0); i < in; ++i)
+    {
+            A[i] = *(tablica + i);
+    }
 }
 
 KWektor::~KWektor()
 {
-    if (A) delete[] A;
 }
 
 KWektor& KWektor::operator=(float* tablica1D)
@@ -34,5 +40,10 @@ float& KWektor::operator()(unsigned i)
     {
         throw std::runtime_error("Indeks poza zakresem");
     }
+    return this->A[i-1];
+}
+
+float KWektor::DajIJ(int i)
+{
     return A[i-1];
 }

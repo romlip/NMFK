@@ -7,12 +7,13 @@
 #include <iostream>
 #include <iomanip>
 #include <math.h>
+#include <algorithm>
 
 using namespace std;
 
 KWezel1D* KSiatka::WezelIstnieje(float x_wezla)
 {
-    for (auto it_w = pWezly.begin(); it_w != pWezly.end(); ++it_w)
+    for (auto it_w = vpWezly.begin(); it_w != vpWezly.end(); ++it_w)
     {
         if ((*it_w)->PobierzX() == x_wezla) // jesli istnieje, pobierz wskaznik na niego
         {
@@ -22,13 +23,51 @@ KWezel1D* KSiatka::WezelIstnieje(float x_wezla)
     return nullptr;
 }
 
+KElement1D* KSiatka::ZnajdzElementZpunktem(KWezel1D* punkt_zrodlowy)
+{
+    for (auto it_e = vElementy.begin(); it_e != vElementy.end(); ++it_e)
+    {
+        float xpz = punkt_zrodlowy->PobierzX();
+        if (it_e->PobierzWezel(1)->PobierzX() < xpz && it_e->PobierzWezel(2)->PobierzX() > xpz)
+            return &*it_e;
+    }
+    return nullptr;
+}
+
+void KSiatka::WstawElementZa(KWezel1D* iwezel)
+{
+    // znajdz element, w ktorym znajduje sie wezel
+    for (auto it_e = vElementy.begin(); it_e != vElementy.end(); ++it_e)
+    {
+        float x_iwezla = iwezel->PobierzX();
+        if (it_e->PobierzWezel(1)->PobierzX() < x_iwezla && it_e->PobierzWezel(2)->PobierzX() > x_iwezla)
+        {
+            vElementy.insert(it_e + 1, KElement1D(it_e->PobierzNumer(), iwezel, it_e->PobierzWezel(2), it_e->Pobierzk(), it_e->Pobierzf()));
+            it_e->UstawWezel(2, iwezel);
+            break;
+        }
+    }
+}
+
+KWezel1D* KSiatka::DodajWezel(float x)
+{
+    KWezel1D* w = new KWezel1D(vpWezly.size() + 1, x);
+    vpWezly.push_back(w);
+    return w;
+}
+
 KSiatka::KSiatka() {
+
     rozmiar = 0;
 }
 
 //KSiatka::KSiatka(char*  nazwa_pliku) {
 //    //ksiatka::wczytaj(nazwa_pliku);
 //}
+
+
+///////////////////////////////////////////////
+// Dodaje element na koncu wektora elementow
 
 void KSiatka::DodajElement(unsigned inr, float ixl, float ixp, float ik, float iif)
 {
@@ -37,41 +76,88 @@ void KSiatka::DodajElement(unsigned inr, float ixl, float ixp, float ik, float i
     //sprawdz czy wezel ixl juz istnieje
     if (!(pxl = WezelIstnieje(ixl))) // jeslie nie, to dodaj go do wektora wezlow
     {
-        if (pWezly.empty())
-            pWezly.emplace_back(new KWezel1D(1, ixl)); // jesli wektor nie istnieje, perwszy wezel ma numer 1
-        else
-            pWezly.emplace_back(new KWezel1D((*(pWezly.end() - 1))->PobierzNumer() + 1, ixl));
-
-        pxl = *(pWezly.end() - 1);
+        pxl = new KWezel1D(vpWezly.size() + 1, ixl);
+        vpWezly.push_back(pxl);
     }
 
     //sprawdz czy wezel ixp juz istnieje
     if (!(pxp = WezelIstnieje(ixp)))
     {
-        if (pWezly.empty())
-            pWezly.emplace_back(new KWezel1D(1, ixp));
-        else
-            pWezly.emplace_back(new KWezel1D((*(pWezly.end() - 1))->PobierzNumer() + 1, ixp));
-
-        pxp = *(pWezly.end() - 1);
+        pxp = new KWezel1D(vpWezly.size() + 1, ixp);
+        vpWezly.push_back(pxp);
     }
 
-    //dodawanie elementu
-    elementy.emplace_back(KElement1D(inr, pxl, pxp, ik, iif)); //dodajemy element na koncu
+    vElementy.emplace_back(KElement1D(inr, pxl, pxp, ik, iif)); //dodaj element na koncu
+}
+
+int KSiatka::PobierzLiczbeWezlowWelemencie()
+{
+    return liczba_wezlow_w_elemencie;
 }
 
 KWezel1D* KSiatka::PobierzWezel(unsigned nrwezla)
 {
-    return *(pWezly.begin() + nrwezla - 1);
+    return *(vpWezly.begin() + nrwezla - 1);
+}
+
+std::vector<KWezel1D*>* KSiatka::PobierzWezly()
+{
+    return &vpWezly;
+}
+
+std::vector<KWezel1D*>* KSiatka::PobierzWezlyWczytane()
+{
+    return &vpWezly_wczytane;
+}
+
+std::vector<KElement1D>* KSiatka::PobierzStrukture()
+{
+    return &vStruktura;
+}
+
+std::vector<KElement1D>* KSiatka::PobierzElementy()
+{
+    return &vElementy;
 }
 
 KSiatka::~KSiatka() {
-    if (!pWezly.empty())
+    if (!vpWezly.empty())
     {
-        for (auto it_wezly = pWezly.begin(); it_wezly != pWezly.end(); ++it_wezly)
+        for (auto it_wezly = vpWezly.begin(); it_wezly != vpWezly.end(); ++it_wezly)
         {
             delete *(it_wezly);
         }
+    }
+    if (!vpWezly_wczytane.empty())
+    {
+        for (auto it_wezly = vpWezly.begin(); it_wezly != vpWezly.end(); ++it_wezly)
+        {
+            delete* (it_wezly);
+        }
+    }
+}
+
+////////////////////////////////////////////////////////
+// Do wczytanej z pliku struktury dodaje punkty zrodlowe
+// i konieczne elementy
+
+
+
+void KSiatka::UstawLiczbeWezlowWelemencie(int iliczba_wezlow)
+{
+    liczba_wezlow_w_elemencie = iliczba_wezlow;
+}
+
+void KSiatka::NumerujWezly()
+{
+    sort(vpWezly.begin(), vpWezly.end(), [](KWezel1D* const& a, KWezel1D* const& b) { return a->PobierzX() < b->PobierzX(); }); // posortuj wektor wezlow po x
+
+    // ustaw numery wezlow w kolejnosci x
+    int i = 1;
+    for (auto it_w : vpWezly)
+    {
+        it_w->UstawNumer(i);
+        i++;
     }
 }
 

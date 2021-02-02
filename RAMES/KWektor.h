@@ -15,10 +15,15 @@ protected:
 public:
     KWektor();
     KWektor(unsigned in);
+    KWektor(unsigned in, const float* tablica);
+
     ~KWektor();
 
     KWektor& operator=(float* const tablica1D);
-
     virtual float& operator()(unsigned i);
+
+    float DajIJ(int i);
+
+
 };
 

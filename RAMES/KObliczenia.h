@@ -11,22 +11,30 @@
 class KObliczenia
 {
 private:
-	short int n; //liczba wezlow w elemencie
 	KDane* dane;
 	KUkladRownan* urMES;
-	std::vector<KMacierz> k; // wektor lokalnych macierzy sztywnosci elementow
-	std::vector<KWektor> p; // wektor lokalnych wektorow naprezen elementow
 
 	KMacierz* StworzLokalnaMacierzSztywnosci(KElement1D* element);
 	KWektor* StworzLokalnyWektorNaprezen(KElement1D* element);
+
 	void WypelnijK(KElement1D* e);
 	void WypelnijP(KElement1D* e);
+
+	void WypelnijUkladRownan(KElement1D* e);
+
 	void WypelnijKWarunkamiBrzegowymi();
+	void WypelnijWarunkamiIRodzaju();
+	void WypelnijWarunkamiIIRodzaju();
+	void WypelnijWarunkamiKonwekcyjnymi(KUkladRownan* ur);
+	void WypelnijZrodlamiPunktowymi(KUkladRownan* ur);
+	void WypelnijZrodlamiRozciaglymi();
 
 public:
 	KObliczenia();
 	~KObliczenia();
 
 	KMacierz* PobierzGlobalnaMacierzSztywnosci();
+	KWektor* PobierzGlobalnyWektorNaprezen();
+
 	KWektor* Licz(KDane* idane);
 };

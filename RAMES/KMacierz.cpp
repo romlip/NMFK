@@ -4,6 +4,58 @@
 
 using namespace std;
 
+
+/////////////////////////////////////////////////////////
+// Domyslny konstruktor
+
+KMacierz::KMacierz()
+{
+    m = 0;
+    n = 0;
+    A = nullptr;
+}
+
+/////////////////////////////////////////////
+// Tworzy macierz kwadratowa in x in i wypelnia ja zerami
+
+KMacierz::KMacierz(int in)
+{
+    m = in;
+    n = in;
+    Stworz();
+}
+
+/////////////////////////////////////////////
+// Tworzy macierz im x in i wypelnia ja zerami
+
+KMacierz::KMacierz(int im, int in)
+{
+    m = im;
+    n = in;
+    Stworz();
+}
+
+KMacierz::KMacierz(unsigned rozmiar, const float* tablica)
+{
+    m = rozmiar;
+    n = rozmiar;
+    Stworz();
+    for (unsigned i(0); i < rozmiar; ++i)
+    {
+        for (unsigned j(0); j < rozmiar; ++j)
+        {
+            A[i * n + j] = *(tablica + i * n + j);
+        }
+    }
+}
+
+////////////////////////////////////////////
+// Domyslny destruktor;
+
+KMacierz::~KMacierz()
+{
+    if (A) delete A;
+}
 void KMacierz::Stworz()
 {
     A = new float[static_cast<unsigned long long>(m) * n]();
@@ -19,7 +71,8 @@ float& KMacierz::operator()(unsigned i, unsigned j)
     {
         throw runtime_error("Indeks poza zakresem");
     }
-    return A[(i - 1) * n + (j-1)];
+
+    return this->A[(i - 1) * n + (j - 1)];
 }
 
 //////////////////////////////////////////////////////////////
@@ -66,43 +119,7 @@ KMacierz& KMacierz::operator+=(float a)
 }
 
 
-/////////////////////////////////////////////////////////
-// Domyslny konstruktor
 
-KMacierz::KMacierz()
-{
-    m = 0;
-    n = 0;
-    A = nullptr;
-}
-
-/////////////////////////////////////////////
-// Tworzy macierz kwadratowa in x in i wypelnia ja zerami
-
-KMacierz::KMacierz(int in)
-{
-    m = in;
-    n = in;
-    Stworz();
-}
-
-/////////////////////////////////////////////
-// Tworzy macierz im x in i wypelnia ja zerami
-
-KMacierz::KMacierz(int im, int in)
-{
-    m = in;
-    n = in;
-    Stworz();
-}
-
-////////////////////////////////////////////
-// Domyslny destruktor;
-
-KMacierz::~KMacierz()
-{
-    if (A) delete[] A;
-}
 
 /////////////////////////////////////////////
 // Wypelnia macierz zerami
@@ -115,13 +132,30 @@ void KMacierz::Zeros()
     }
 }
 
+unsigned KMacierz::DajM()
+{
+    return m;
+}
+
+unsigned KMacierz::DajN()
+{
+    return n;
+}
+
+float KMacierz::DajIJ(int i, int j)
+{
+    if (i > m || j > n)
+        cerr << "Blont! Niepoprawny indeks.";
+    return A[(i - 1) * n + (j - 1)];
+}
+
 void KMacierz::Wypisz(std::ostream &out)
 {
     for (unsigned i= 0; i < m; i++)
     {
         for (unsigned j = 0; j < n; j++)
         {
-            out << A[i * n + j] << "   ";
+            out << A[i * n + j] << "\t";
         }
         out << "\n";
     }

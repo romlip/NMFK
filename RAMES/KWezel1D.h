@@ -11,6 +11,7 @@ public:
 	KWezel1D();
 	KWezel1D(unsigned inumer, float ix);
 
+	void UstawNumer(unsigned inumer);
 	void UstawTemperature(float);
 
 	unsigned PobierzNumer();

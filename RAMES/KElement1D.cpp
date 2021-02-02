@@ -16,8 +16,8 @@ KElement1D::KElement1D(unsigned inumer, KWezel1D* ilewy, KWezel1D* iprawy, float
 	numer = inumer;
 	k = ik;
 	f = iff;
-	wezly_e.push_back(ilewy);
-	wezly_e.push_back(iprawy);
+	vpWezly.push_back(ilewy);
+	vpWezly.push_back(iprawy);
 }
 
 KElement1D::~KElement1D() 
@@ -37,7 +37,17 @@ void KElement1D::UstawLiczbeWezlow(short int in)
 
 std::vector<KWezel1D*>* KElement1D::PobierzWezly()
 {
-	return &wezly_e;
+	return &vpWezly;
+}
+
+void KElement1D::UstawWezel(int i, KWezel1D* wezel)
+{
+	vpWezly[i - 1] = wezel;
+}
+
+void KElement1D::UstawNumer(unsigned inumer)
+{
+	numer = inumer;
 }
 
 int KElement1D::PobierzNumer()
@@ -45,9 +55,14 @@ int KElement1D::PobierzNumer()
 	return numer;
 }
 
+KWezel1D* KElement1D::PobierzWezel(int ity_wezel)
+{
+	return vpWezly[ity_wezel - 1];
+}
+
 float KElement1D::Pobierzh()
 {
-	return (*(wezly_e.end() - 1))->PobierzX() - (*(wezly_e.begin()))->PobierzX();
+	return (*(vpWezly.end() - 1))->PobierzX() - (*(vpWezly.begin()))->PobierzX();
 }
 
 float KElement1D::Pobierzk()
