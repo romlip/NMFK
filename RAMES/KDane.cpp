@@ -5,6 +5,7 @@ using namespace std;
 
 KDane::KDane()
 {
+	mDaneFlag = false;
 	siatka = new KSiatka();
 }
 
@@ -44,6 +45,21 @@ void KDane::DodajWezlyWarI()
 			}
 		}
 	}
+}
+
+void KDane::DodajWezlyWarII()
+{
+	for (auto it_wii = warunkiII.begin(); it_wii != warunkiII.end(); ++it_wii)
+	{
+		for (auto it_w = siatka->PobierzWezly()->begin(); it_w != siatka->PobierzWezly()->end(); ++it_w)
+		{
+			if ((*it_w)->PobierzX() == it_wii->x)
+			{
+				it_wii->pWii = *it_w;
+			}
+		}
+	}
+
 }
 
 void KDane::DodajWezlyWarKon()
@@ -124,17 +140,20 @@ vector<strukt_warunek_konwekcyjny>* KDane::PobierzWarunkiKonwekcyjne()
  {
 	 // sprawdz czy struktura sie wczytala
 	 if (siatka->PobierzWezly()->empty())
-	 {
 		 throw runtime_error("Nie wczytano struktury");
-	 }
+
 	 *siatka->PobierzStrukture() = *siatka->PobierzElementy(); 	 // zapisz wczytane elementy jako pierwotna strukture
 
 	 DodajPunktyZrodlowe();	 // dodaj wezly w punktach zrodlowych i wumiesc ich wskazniki w wektorze zrodla_punktowe
-	 DodajWezlyWarI(); // dodaj wskazniki wezlow warunku I w wektorze warunkiI
-	 DodajWezlyWarKon();
-
 	 siatka->NumerujWezly();
-
 	 *siatka->PobierzWezlyWczytane() = *siatka->PobierzWezly(); // zapisz wczytane wezly i punkty zrodlowe jako pierwotne
 
+	 DodajWezlyWarI(); // dodaj wskazniki wezlow warunku I w wektorze warunkiI
+	 DodajWezlyWarII();
+	 DodajWezlyWarKon(); // dodaj wskazniki wezlow warunk konwekcyjnego w wektorze warunki_konwekcyjne
+
+	 siatka->DodajWezlyWewnetrzne();// dodaje wezly wewnatrz elementu
+	 siatka->NumerujWezly();
+
+	 mDaneFlag = true;
  }

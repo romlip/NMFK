@@ -10,27 +10,31 @@ class KUkladRownan
 {
 private:
 	KMacierz* A; //macierz wspolczynnikow
-	KWektor* Y; // wektor wyrazow wolnych
-	KWektor* X; // wektor niewiadomych
+	KWektorK* B; // wektor wyrazow wolnych
+	KWektorK* X; // wektor niewiadomych
 
-	KWektor* RozwiazGradientamiSprzezonymi();
+	KWektorK* RozwiazGradientamiSprzezonymi();
+	KWektorK* RozwiazNadrelaksacja();
+	KWektorK* RozwiazCholesky();
+	KWektorK* RozwiazEliminacja(int gorna_dolna);
 
 public:
 
 	KUkladRownan();
-	KUkladRownan(unsigned ili_wezlow);
+	//KUkladRownan(unsigned ili_wezlow);
+	KUkladRownan(KMacierz *A, KWektorK* iX, KWektorK* B);
 	~KUkladRownan();
 
 	KMacierz* PobierzA();
-	KWektor* PobierzY();
-	KWektor* PobierzX();
-
+	KWektorK* PobierzB();
+	KWektorK* PobierzX();
 	void UstawA(KMacierz* iA);
-	void UstawY(KWektor* iY);
+	void UstawB(KWektorK* iB);
 
-	KWektor* Rozwiaz(const char* imetoda);
-	KWektor* Rozwiaz(KMacierz* iA, KWektor* iY, const char* imetoda);
+	KWektorK* Rozwiaz(const char* imetoda = "cholesky");
+	KWektorK* Rozwiaz(KMacierz* iA, KWektorK* iY, const char* imetoda);
 
+	KWektorK f(KMacierz& B, KWektorK& c, KWektorK& x0);
 
 };
 

@@ -24,9 +24,8 @@ double mes::calka_11(double f(double), int n)
 
 double mes::calka_11(double f_ksi[], int n)
 {
-    double suma;
+    double suma = 0;
     for (int i = 0; i < n; i++)
         suma += H[n][i] * f_ksi[i];
     return suma;
 }
-

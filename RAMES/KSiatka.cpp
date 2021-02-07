@@ -42,16 +42,41 @@ void KSiatka::WstawElementZa(KWezel1D* iwezel)
         float x_iwezla = iwezel->PobierzX();
         if (it_e->PobierzWezel(1)->PobierzX() < x_iwezla && it_e->PobierzWezel(2)->PobierzX() > x_iwezla)
         {
-            vElementy.insert(it_e + 1, KElement1D(it_e->PobierzNumer(), iwezel, it_e->PobierzWezel(2), it_e->Pobierzk(), it_e->Pobierzf()));
+            KWezel1D* e_prawy = it_e->PobierzWezel(2);
             it_e->UstawWezel(2, iwezel);
+            vElementy.insert(it_e + 1, KElement1D(it_e->PobierzNumer(), iwezel, e_prawy, it_e->Pobierzk(), it_e->Pobierzf()));
             break;
+        }
+    }
+}
+
+//////////////////////////////////////////////////
+// Dodaje wezly wewnetrzne elementow zgodnie z iloscia podana 
+// w liczba_wezlow_w_elemencie
+
+void KSiatka::DodajWezlyWewnetrzne()
+{
+    if (liczba_wezlow_w_elemencie > 2)
+    {
+        float xl, h;
+        KWezel1D* pNowyWezel;
+        for (auto it_e = vElementy.begin(); it_e != vElementy.end(); ++it_e)
+        {
+            xl = it_e->PobierzWezel(1)->PobierzX();
+            h = it_e->Pobierzh();
+            for (unsigned i(0); i < liczba_wezlow_w_elemencie - 2; ++i)
+            {
+                pNowyWezel = DodajWezel(xl + (i + 1) * h / (liczba_wezlow_w_elemencie - 1));
+                auto it_we = it_e->PobierzWezly()->end();
+                it_e->PobierzWezly()->insert(it_we - 1, pNowyWezel);
+            }
         }
     }
 }
 
 KWezel1D* KSiatka::DodajWezel(float x)
 {
-    KWezel1D* w = new KWezel1D(vpWezly.size() + 1, x);
+    KWezel1D* w = new KWezel1D((unsigned)vpWezly.size() + 1, x);
     vpWezly.push_back(w);
     return w;
 }
@@ -76,14 +101,14 @@ void KSiatka::DodajElement(unsigned inr, float ixl, float ixp, float ik, float i
     //sprawdz czy wezel ixl juz istnieje
     if (!(pxl = WezelIstnieje(ixl))) // jeslie nie, to dodaj go do wektora wezlow
     {
-        pxl = new KWezel1D(vpWezly.size() + 1, ixl);
+        pxl = new KWezel1D((unsigned)vpWezly.size() + 1, ixl);
         vpWezly.push_back(pxl);
     }
 
     //sprawdz czy wezel ixp juz istnieje
     if (!(pxp = WezelIstnieje(ixp)))
     {
-        pxp = new KWezel1D(vpWezly.size() + 1, ixp);
+        pxp = new KWezel1D((unsigned)vpWezly.size() + 1, ixp);
         vpWezly.push_back(pxp);
     }
 

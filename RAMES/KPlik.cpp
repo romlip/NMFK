@@ -23,12 +23,12 @@ KPlik::~KPlik()
 {
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//wczytuje plik ze struktura i zwraca wskaznik na utworzona w ten sposob siatke
+///////////////////////////////////////////////////////////////////////////////
+// wczytuje plik ze struktura i zwraca wskaznik na utworzona w ten sposob siatke
 
 int KPlik::SzukajSpecyfikatora(ifstream& plik, string &line)
 {
-	string sspecyfikatory[] = {"STRUKTURA", "WARUNKI_BRZEGOWE_I_RODZAJU", "WARUNKI_BRZEGOWE_II_RODZAJU", "WARUNKI_KONWEKCYJNE", "ZRODLA_PUNKTOWE", "ZRODLA_ROZCIAGLE", "LICZBA_WEZLOW_W_ELEMENCIE", "SKALA" };
+	string sspecyfikatory[] = {"STRUKTURA", "WARUNKI_BRZEGOWE_I_RODZAJU", "WARUNKI_BRZEGOWE_II_RODZAJU", "WARUNKI_KONWEKCYJNE", "ZRODLA_PUNKTOWE", "ZRODLA_ROZCIAGLE", "LICZBA_WEZLOW_W_ELEMENCIE", "NAZWA", "SKALA" };
 
 	while (getline(plik, line) && plik.good())
 	{
@@ -76,6 +76,9 @@ int KPlik::WczytajDane(char* inazwaPliku, KDane* dane)
 			break;
 		case LICZBA_WEZLOW:
 			CzytajLiczbeWezlow(pliczek, dane, line);
+			break;
+		case NAZWA:
+			CzytajNazwe(pliczek, dane, line);
 			break;
 		default:
 			break;
@@ -164,7 +167,6 @@ void KPlik::CzytajZrodlaRozciagle(std::ifstream& plik, KDane* dane)
 		strukt_zrodlo_rozciagle zrodlo = { x, g }; // [g] = [W/m^2]
 		dane->DodajZrodloRozciagle(zrodlo);
 	}
-
 }
 
 void KPlik::CzytajStrukture(ifstream& plik, KDane* dane)
@@ -192,35 +194,79 @@ void KPlik::CzytajLiczbeWezlow(ifstream& plik, KDane* dane, string& line)
 	dane->PobierzSiatke()->UstawLiczbeWezlowWelemencie(liczba_wezlow);
 }
 
-void KPlik::ZapiszWynik(char* inazwaPliku, KDane* dane, KObliczenia* obliczenia)
+void KPlik::CzytajNazwe(ifstream& plik, KDane* dane, string& line)
 {
-	ofstream plik(inazwaPliku, ios::out);
+	stringstream sline(line);
+	string specyf;
+	sline >> specyf >> nazwaStruktury;
+}
+
+void KPlik::ZapiszWynik(KDane* dane, KObliczenia* obliczenia, const char* inazwaPliku)
+{	
+	string wynikiPath;
+	if (inazwaPliku == "")
+		wynikiPath = wynikiDir + nazwaStruktury + ".txt";
+	else
+		wynikiPath = inazwaPliku;
+
+	ofstream plik(wynikiPath, ios::out);
+
 	if (plik.good())
 	{
-		plik << "wezly\n";
-		for (auto it_wezly = dane->PobierzSiatke()->vpWezly.begin(); it_wezly != dane->siatka->vpWezly.end(); ++it_wezly)
-		{
-			plik <<(*it_wezly)->PobierzNumer() <<"\t"<<(*it_wezly)->PobierzX() << "\n";
-		}
+		obliczenia->WypiszWynik(plik);
+		//plik << "wezly\n";
+		//for (auto it_wezly = dane->PobierzSiatke()->vpWezly.begin(); it_wezly != dane->siatka->vpWezly.end(); ++it_wezly)
+		//{
+		//	plik <<(*it_wezly)->PobierzNumer() <<"\t"<<(*it_wezly)->PobierzX() << "\n";
+		//}
 
-		plik << "elementy\n";
-		for (auto it_elementy = dane->siatka->vElementy.begin(); it_elementy != dane->siatka->vElementy.end(); ++it_elementy)
-		{
-			plik << it_elementy->PobierzNumer() << "\t";
-			for (auto it_wezly = it_elementy->PobierzWezly()->begin(); it_wezly != it_elementy->PobierzWezly()->end(); ++it_wezly)
-				plik << (*it_wezly)->PobierzX() << "\t";
-			plik << it_elementy->Pobierzk() / it_elementy->Pobierzh() << "\n";
-		}
+		//plik << "elementy\n";
+		//for (auto it_elementy = dane->siatka->vElementy.begin(); it_elementy != dane->siatka->vElementy.end(); ++it_elementy)
+		//{
+		//	plik << it_elementy->PobierzNumer() << "\t";
+		//	for (auto it_wezly = it_elementy->PobierzWezly()->begin(); it_wezly != it_elementy->PobierzWezly()->end(); ++it_wezly)
+		//		plik << (*it_wezly)->PobierzX() << "\t";
+		//	plik << it_elementy->Pobierzk() / it_elementy->Pobierzh() << "\n";
+		//}
 	}
-	plik << "\nmacierz sztywnosci:\n";
+	//plik << "\nmacierz sztywnosci:\n";
 
-	KMacierz* K = obliczenia->PobierzGlobalnaMacierzSztywnosci();
-	K->Wypisz(plik);
+	////KMacierz* K = obliczenia->PobierzGlobalnaMacierzSztywnosci();
+	////K->Wypisz(plik);
 
-	plik << "\nwektor naprezen:\n";
-	KWektor* P = obliczenia->PobierzGlobalnyWektorNaprezen();
-	P->Wypisz(plik);
+	////plik << "\nwektor naprezen:\n";
+	////KWektorK* P = obliczenia->PobierzGlobalnyWektorNaprezen();
+	////P->Wypisz(plik);
 
+	//plik << "\n\nWynik:\n\n";
+
+	//obliczenia->PobierzUkladRownan()->PobierzX()->Wypisz(plik);
+
+	////float tab1[][2] = { {7,2}, {3,-2}, {5,-5} };
+	////KMacierz A(3,2, (float*)tab1);
+	////float tab2[][3] = { {-11,2, 2}, {-2,1, 5} };
+	////KMacierz B(2, 3, (float*)tab2);
+
+	////KMacierz C = A * B;
+	////KMacierz D = C.Inverse();
+	////C.Wypisz(plik);
+	////D.Wypisz(plik);
+	//KMacierz G(3);
+	//for (int i(1); i <= 3; i++)
+	//	for (int j(1); j <= 3; ++j)
+	//		G(i, j) = (i-1) * 3 + j;
+	//G(1, 1) = -1;
+
+	//plik << "\nG:\n";
+	//G.Wypisz(plik);
+
+	//plik << "\ninverse:\n";
+	//(G.Inverse()).Wypisz(plik);
+
+	//plik << "\ndeterminant:" << G.getDeterminant();
+
+	//plik << "\n\ncofactor:\n";
+	//G.getCofactor().Wypisz(plik);
 }
 
 

@@ -38,6 +38,7 @@ public:
 	void DodajElement(unsigned inr, float ixl, float ixp, float ik, float iif);
 	//void WstawElement(unsigned inr, float ixl, float ixp, float k);
 	void WstawElementZa(KWezel1D* iwezel);
+	void DodajWezlyWewnetrzne();
 
 	int PobierzLiczbeWezlowWelemencie();
 	KWezel1D* PobierzWezel(unsigned nrwezla);

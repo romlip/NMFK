@@ -7,12 +7,15 @@ class KPlik
 {
 private:
 	char* nazwaPliku;
-	enum enum_spec { STRUKTURA , WARUNKI_BRZEGOWE_I_RODZAJU, WARUNKI_BRZEGOWE_II_RODZAJU, WARUNKI_KONWEKCYJNE, ZRODLA_PUNKTOWE, ZRODLA_ROZCIAGLE, LICZBA_WEZLOW, SKALA }
+	enum enum_spec { STRUKTURA , WARUNKI_BRZEGOWE_I_RODZAJU, WARUNKI_BRZEGOWE_II_RODZAJU, WARUNKI_KONWEKCYJNE, ZRODLA_PUNKTOWE, ZRODLA_ROZCIAGLE, LICZBA_WEZLOW, NAZWA, SKALA }
 	specyfikatory;
+	std::string wynikiDir = "Wyniki/";
 	const char* start = "START";
 	const char* koniec = "KONIEC";
 
 public:
+	std::string nazwaStruktury;
+
 	KPlik();
 	KPlik(char* inazwaPliku);
 	~KPlik();
@@ -27,7 +30,8 @@ public:
 	void CzytajZrodlaRozciagle(std::ifstream& plik, KDane* dane);
 	void CzytajStrukture(std::ifstream& plik, KDane* dane);
 	void CzytajLiczbeWezlow(std::ifstream& plik, KDane* dane, std::string& line);
+	void CzytajNazwe(std::ifstream& plik, KDane* dane, std::string& line);
 
-	void ZapiszWynik(char* inazwaPliku, KDane* dane, KObliczenia* obliczenia);
+	void ZapiszWynik(KDane* dane, KObliczenia* obliczenia, const char* inazwaPliku = "");
 };
 

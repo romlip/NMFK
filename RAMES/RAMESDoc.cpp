@@ -28,6 +28,7 @@ BEGIN_MESSAGE_MAP(CRAMESDoc, CDocument)
 	ON_COMMAND(ID_DANE_WCZYTAJ, &CRAMESDoc::OnDaneWczytaj)
 	ON_COMMAND(ID_WYNIKI_ZAPISZ, &CRAMESDoc::OnWynikiZapisz)
 	ON_COMMAND(ID_OBLICZENIA_WYKONAJ, &CRAMESDoc::OnObliczeniaWykonaj)
+	ON_COMMAND(ID_WYNIKI_ZAPISZJAKO, &CRAMESDoc::OnWynikiZapiszjako)
 END_MESSAGE_MAP()
 
 
@@ -35,20 +36,18 @@ END_MESSAGE_MAP()
 
 CRAMESDoc::CRAMESDoc() noexcept
 {
+	ClearFlags();
 	// TODO: add one-time construction code here
 	dane = new KDane();
 	plik = new KPlik();
 	obliczenia = new KObliczenia();
-
-	KMacierz mojamacierz;
 }
 
 CRAMESDoc::~CRAMESDoc()
 {
-	if (plik)
-		delete plik;
-	if (dane)
-		delete dane;
+	if (plik)delete plik;
+	if (dane)delete dane;
+	if (obliczenia)delete obliczenia;
 }
 
 BOOL CRAMESDoc::OnNewDocument()
@@ -191,12 +190,39 @@ void CRAMESDoc::OnWynikiZapisz()
 
 	//	
 	//}
-	plik->ZapiszWynik("wyniki.txt", dane, obliczenia);
+	plik->ZapiszWynik(dane, obliczenia);
 }
 
 
 void CRAMESDoc::OnObliczeniaWykonaj()
 {
-	wektorWynikowy = obliczenia->Licz(dane);
+	obliczenia->Licz(dane);
 	// TODO: Add your command handler code here
+}
+
+void CRAMESDoc::ClearFlags()
+{
+	//dane->mDaneFlag = false;
+	//obliczenia->mObliczeniaFlag = false;
+}
+
+
+void CRAMESDoc::OnWynikiZapiszjako()
+{
+	CString pathName_CS;
+	std::string cDomyslnaNazwaPliku = plik->nazwaStruktury;
+
+	char cSciezkaPliku[250];
+
+	TCHAR szFilters[] = _T("Pliki wynikow(*.txt)|*.txt|Syckie pliki (*.*)|*.*||");
+
+	CFileDialog fileDlg(FALSE, _T("txt"), (CString)cDomyslnaNazwaPliku.c_str() , OFN_HIDEREADONLY |  OFN_OVERWRITEPROMPT, szFilters);
+
+	if (fileDlg.DoModal() == IDOK) {
+		pathName_CS = fileDlg.GetPathName();
+
+		sprintf_s(cSciezkaPliku, "%S", pathName_CS);
+
+		plik->ZapiszWynik(dane, obliczenia, cSciezkaPliku);
+	}
 }

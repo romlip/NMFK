@@ -27,7 +27,7 @@ public:
 
 	std::vector<KWezel1D*>* PobierzWezly();
 	KWezel1D* PobierzWezel(int ity_wezel);
-	int PobierzNumer();
+	unsigned PobierzNumer();
 	float Pobierzh();
 	float Pobierzk();
 	float Pobierzf();

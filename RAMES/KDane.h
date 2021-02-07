@@ -13,6 +13,7 @@ struct strukt_warunekI {
 struct strukt_warunekII {
 	float x;
 	float q;
+	KWezel1D* pWii;
 };
 
 struct strukt_warunek_konwekcyjny {
@@ -47,6 +48,7 @@ private:
 	KSiatka* siatka;
 
 public:
+	bool mDaneFlag;
 	friend class KPlik;
 	KDane();
 	~KDane();
@@ -54,6 +56,8 @@ public:
 	void FinalizujWczytywanie();
 	void DodajPunktyZrodlowe();
 	void DodajWezlyWarI();
+	void DodajWezlyWarII();
+
 	void DodajWezlyWarKon();
 	void DodajWarunekI(strukt_warunekI& warunekI);
 	void DodajWarunekII(strukt_warunekII& warunekII);

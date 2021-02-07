@@ -50,7 +50,7 @@ void KElement1D::UstawNumer(unsigned inumer)
 	numer = inumer;
 }
 
-int KElement1D::PobierzNumer()
+unsigned KElement1D::PobierzNumer()
 {
 	return numer;
 }

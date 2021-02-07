@@ -5,25 +5,45 @@
 class KWektor :
     public KMacierz
 {
-//    using KMacierz::KMacierz;
-
-private:
-    static const unsigned m = 1;
-
 protected:
 
 public:
-    KWektor();
-    KWektor(unsigned in);
-    KWektor(unsigned in, const float* tablica);
+    KWektor() {};
+    KWektor(unsigned im, unsigned in) : KMacierz(im, in) {};
+    ~KWektor() {};
 
-    ~KWektor();
-
-    KWektor& operator=(float* const tablica1D);
+    virtual KWektor& operator=(float* const tablica1D);
     virtual float& operator()(unsigned i);
 
-    float DajIJ(int i);
-
-
+    float DajI(int i);
 };
+
+class KWektorW :
+    public KWektor
+{
+protected:
+    static const unsigned m = 1; // 1 wiersz
+
+public:
+    KWektorW() : KWektor() {};
+    KWektorW(unsigned in) : KWektor(m, in) {};
+    KWektorW(unsigned in, const float* tablica);
+    ~KWektorW() {};
+};
+
+class KWektorK :
+    public KWektor
+{
+protected:
+    static const unsigned n = 1; // 1 kolumna
+
+public:
+    //KWektorK() : KWektor() {};
+    KWektorK(unsigned im) : KWektor(im, n) {};
+    KWektorK(unsigned im, const float* tablica);
+    KWektorK(KMacierz &iM);
+
+    ~KWektorK() {};
+};
+
 

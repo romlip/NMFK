@@ -10,8 +10,9 @@ using namespace std;
 
 KObliczenia::KObliczenia()
 {
+	mObliczeniaFlag = false;
 	dane = new KDane();
-	urMES = new KUkladRownan();
+	urMES = nullptr;
 }
 
 KObliczenia::~KObliczenia()
@@ -20,7 +21,6 @@ KObliczenia::~KObliczenia()
 	if (dane) delete dane;
 }
 
-
 KMacierz* KObliczenia::StworzLokalnaMacierzSztywnosci(KElement1D* element)
 {
 	KMacierz* k = nullptr;
@@ -28,33 +28,45 @@ KMacierz* KObliczenia::StworzLokalnaMacierzSztywnosci(KElement1D* element)
 	switch (dane->PobierzSiatke()->PobierzLiczbeWezlowWelemencie())
 	{
 	case 2:
+	{
 		float kk[][2] = { {1,-1}, {-1,1} };
-		k = new KMacierz(2,(float*) kk);
+		k = new KMacierz(2, (float*)kk);
+		(*k) *= element->Pobierzk() / element->Pobierzh();
+		break; }
+	case 3:
+	{
+		float k3[][3] = { {7,-8, 1}, {-8, 16, -8}, {1, -8, 7} };
+		k = new KMacierz(3, (float*)k3);
+		(*k) *= element->Pobierzk() / 3. / element->Pobierzh();
 		break;
 	}
-	(*k) *= element->Pobierzk() / element->Pobierzh(); // lambda/h * [1,-1; -1,1]
-
-	ofstream plik("ke.txt");
-	k->Wypisz(plik);
+	}
+ // lambda/h * [1,-1; -1,1]
 
 	return k;
 }
 
-KWektor* KObliczenia::StworzLokalnyWektorNaprezen(KElement1D* element)
+KWektorK* KObliczenia::StworzLokalnyWektorNaprezen(KElement1D* element)
 {
-	KWektor* p = nullptr;
+	KWektorK* p = nullptr;
 
 	switch (dane->PobierzSiatke()->PobierzLiczbeWezlowWelemencie())
 	{
 	case 2:
+	{
 		float pp[2] = { 1,1 };
-		p = new KWektor(2, (float*)pp);
+		p = new KWektorK(2, (float*)pp);
 		break;
 	}
-	(*p) *= 0.5 * element->Pobierzh() * element->Pobierzf(); // 0.5*f*h* [1,1]
-
-	ofstream plik("pe.txt");
-	p->Wypisz(plik);
+	case 3:
+	{
+		float pp[3] = {1,4,1 };
+		p = new KWektorK(3, (float*)pp);
+		(*p) *= element->Pobierzh() * element->Pobierzf() / 6.;
+		break;
+	}
+	}
+	(*p) *= element->Pobierzh() * element->Pobierzf() * 0.5 ; // 0.5*f*h* [1,1]
 
 	return p;
 }
@@ -94,14 +106,12 @@ void KObliczenia::WypelnijK(KElement1D *e)
 		}
 	}
 
-	//k_e->Wypisz(plik);
-
 	delete k_e;
 }
 
 void KObliczenia::WypelnijP(KElement1D* e)
 {
-	KWektor* p_e = StworzLokalnyWektorNaprezen(e);
+	KWektorK* p_e = StworzLokalnyWektorNaprezen(e);
 
 	// okresl ile i ktore wezly w elemencie jest warunkami brzegowymi I rodzaju
 	int il_wezlow_z_war_I = 0;
@@ -120,35 +130,35 @@ void KObliczenia::WypelnijP(KElement1D* e)
 	{
 		if (any_of(wezly_war_I.begin(), wezly_war_I.end(), [&](const int& ity) { return ity == i; }))
 			continue;
-		(*urMES->PobierzY())(e->PobierzWezel(i)->PobierzNumer()) += p_e->DajIJ(i);
+		(*urMES->PobierzB())(e->PobierzWezel(i)->PobierzNumer()) += p_e->DajI(i);
 	}
-	ofstream plik("P.txt");
-	p_e->Wypisz(plik);
+
 	delete p_e;
 }
 
 void KObliczenia::WypelnijUkladRownan(KElement1D* e)
 {
+	// towrzy lokalne macierze sztywnosci i wektor naprezen dla elementu
 	KMacierz* k_e = StworzLokalnaMacierzSztywnosci(e);
-	KWektor* p_e = StworzLokalnyWektorNaprezen(e);
+	KWektorK* p_e = StworzLokalnyWektorNaprezen(e);
 
 	unsigned globalny_nr;
 	float wyraz_warI;
 
-	// okresl ktore wezly w elemencie sa warunkami brzegowymi I rodzaju
+	// okresl ktore wezly w elemencie sa warunkami brzegowymi I rodzaju; sluzy do redukcji ilosci rownan
 	vector<unsigned> wezly_war_I; //wektor numerow wezlow elementu bedacych warunkami I rodzaju
 	vector<int> il_wezlow_war_I_przed;
 	for (int i(1); i <= e->PobierzWezly()->size(); ++i) // iteruj po wezlach elementu e
 	{
+		il_wezlow_war_I_przed.push_back(0);
 		for (auto it_warI : *dane->PobierzWarunkiI()) // iteruj po globalnych warunkach I
 		{
-			if (e->PobierzWezel(i)->PobierzX() == it_warI.x) // jesli i-ty wezel elementu jest warunkiem brzegowym
+			if (e->PobierzWezel(i) == it_warI.pw) // jesli i-ty wezel elementu jest warunkiem brzegowym
 				wezly_war_I.push_back(i);
 
 			// okresl ile wezlow o mniejszych numerach w pozostalych elementach sa warunkami I rodzaju; sluzy do zmiany indeksow globalnego zredukowanego ukladu rownan
-			il_wezlow_war_I_przed.push_back(0);
 			if (it_warI.pw->PobierzNumer() < e->PobierzWezel(i)->PobierzNumer())
-				il_wezlow_war_I_przed[i - 1] += 1;
+				++il_wezlow_war_I_przed[i - 1];
 		}
 	}
 
@@ -168,17 +178,18 @@ void KObliczenia::WypelnijUkladRownan(KElement1D* e)
 
 	// uzupelnij gloablny wektor naprezen wektorem lokalnym z wylaczeniem elementow o indeksach odpowiadajacych wezlom
 	// bedacymi warunkami I rodzaju
-	for (unsigned i = 1; i <= p_e->DajN(); i++)
+	for (unsigned i = 1; i <= p_e->DajM(); i++)
 	{
-		wyraz_warI = 0;
 		if (any_of(wezly_war_I.begin(), wezly_war_I.end(), [&](const int& ity) { return ity == i; }))
 			continue;
+
+		wyraz_warI = 0;
 		globalny_nr = e->PobierzWezel(i)->PobierzNumer() - il_wezlow_war_I_przed[i - 1];
-		for (auto it_wI : wezly_war_I)
+		for (auto it_wI : wezly_war_I) // jesli element posiada wezly bedace warunkami I rodzaju
 		{
-			wyraz_warI += (*k_e)(i, it_wI) * dane->PobierzSiatke()->PobierzWezel(globalny_nr)->PobierzTemperature();
+			wyraz_warI = (*k_e)(i, it_wI) * e->PobierzWezel(it_wI)->PobierzTemperature();
 		}
-		(*urMES->PobierzY())(globalny_nr) += p_e->DajIJ(i) - wyraz_warI;
+		(*urMES->PobierzB())(globalny_nr) += p_e->DajI(i) - wyraz_warI;
 	}
 
 	delete k_e;
@@ -187,23 +198,28 @@ void KObliczenia::WypelnijUkladRownan(KElement1D* e)
 
 void KObliczenia::WypelnijKWarunkamiBrzegowymi()
 {
-	WypelnijWarunkamiIRodzaju();
-	WypelnijWarunkamiIIRodzaju();
+	//WypelnijWarunkamiIRodzaju();
+	//WypelnijWarunkamiIIRodzaju();
 }
 
 
-KWektor* KObliczenia::Licz(KDane* idane)
+KWektorK* KObliczenia::Licz(KDane* idane)
 {
 	if (dane) delete dane;
 	dane = idane;
 
 	// tworzenie i wypelnianie ukladu rownan
-	unsigned il_warunkow_I = dane->PobierzWarunkiI()->size();
+	unsigned il_warunkow_I = (unsigned)dane->PobierzWarunkiI()->size();
 	unsigned rozmiar = (unsigned)dane->PobierzSiatke()->vpWezly.size() - il_warunkow_I; // rozmiar ukladu rownan = ilosc wezlow - ilosc waunkow I rozadju
-	urMES = new KUkladRownan(rozmiar);
+
+	KMacierz K(rozmiar); // globalna macierz sztywnosci
+	KWektorK P(rozmiar); // globalny wektor naprezen
+	KWektorK X(rozmiar);
+
+	urMES = new KUkladRownan(&K, &X, &P);
 
 	// iteruj po wszystkich elementach i uzupelnij globalna macierz sztywnosci macierzami lokalnymi
-	for (auto it_e =  dane->PobierzSiatke()->vElementy.begin(); it_e != dane->PobierzSiatke()->vElementy.end(); ++it_e)
+	for (auto it_e =  dane->PobierzSiatke()->PobierzElementy()->begin(); it_e != dane->PobierzSiatke()->PobierzElementy()->end(); ++it_e)
 	{
 
 		//KMacierz k(wymiar);
@@ -225,36 +241,57 @@ KWektor* KObliczenia::Licz(KDane* idane)
 
 	// uwzglednij warunki brzegowe i zrodla punktowe w wektorze naprezen
 	WypelnijZrodlamiPunktowymi(urMES);
+	WypelnijWarunkamiIIRodzaju(urMES);
 	WypelnijWarunkamiKonwekcyjnymi(urMES);
 
 	// rozwiaz uklad rownan
+	urMES->Rozwiaz();
+	UstawTemperatureWezlow();
+	mObliczeniaFlag = true;
 
 	return urMES->PobierzX();
 }
 
-void KObliczenia::WypelnijWarunkamiIRodzaju()
+void KObliczenia::WypiszWynik(ostream& iplik)
 {
-	for (auto it_warI = dane->PobierzWarunkiI()->begin(); it_warI != dane->PobierzWarunkiI()->begin(); ++it_warI)
+	iplik << "x\tT\n" ;
+	for (auto it_w : *dane->PobierzSiatke()->PobierzWezly())
 	{
-		
+		iplik <<setprecision(5)<< it_w->PobierzX() <<"\t"<< it_w->PobierzTemperature() << "\n";
 	}
 }
 
-void KObliczenia::WypelnijWarunkamiIIRodzaju()
+void KObliczenia::WypelnijWarunkamiIRodzaju()
 {
+}
 
+void KObliczenia::WypelnijWarunkamiIIRodzaju(KUkladRownan* ur)
+{
+	unsigned il_wezlow_z_war_I = 0;
+	float q;
+
+	for (auto it_wII : *dane->PobierzWarunkiII())
+	{
+		// sprawdz ile wezlow z warunkami I rodzaju  znajduje sie przed wezlem z warunkiem konwekcyjnym
+		for (auto it_wI : *dane->PobierzWarunkiI())
+		{
+			if (it_wI.pw->PobierzNumer() < it_wII.pWii->PobierzNumer()) // jesli i-ty wezel jest warunkiem brzegowym
+				il_wezlow_z_war_I++;
+		}
+
+		// wypelnij globalny wektor naprezen warunkiem
+		q = it_wII.q;
+		(*ur->PobierzB())(it_wII.pWii->PobierzNumer() - il_wezlow_z_war_I) += q;
+	}
 }
 
 void KObliczenia::WypelnijWarunkamiKonwekcyjnymi(KUkladRownan* ur)
 {
-	unsigned il_wezlow_z_war_I;
+	unsigned il_wezlow_z_war_I = 0;
 	float h, T_inf;
-
 
 	for (auto it_wk : *dane->PobierzWarunkiKonwekcyjne())
 	{
-		il_wezlow_z_war_I = 0;
-
 		// sprawdz ile wezlow z warunkami I rodzaju  znajduje sie przed wezlem z warunkiem konwekcyjnym
 		for (auto it_wI : *dane->PobierzWarunkiI())
 		{
@@ -265,7 +302,7 @@ void KObliczenia::WypelnijWarunkamiKonwekcyjnymi(KUkladRownan* ur)
 		// wypelnij globalny wektor naprezen warunkiem
 		h = it_wk.h;
 		T_inf = it_wk.T_inf;
-		(*ur->PobierzY())(it_wk.wk->PobierzNumer() - il_wezlow_z_war_I) += h * T_inf;
+		(*ur->PobierzB())(it_wk.wk->PobierzNumer() - il_wezlow_z_war_I) += h * T_inf;
 		(*ur->PobierzA())(it_wk.wk->PobierzNumer() - il_wezlow_z_war_I, it_wk.wk->PobierzNumer() - il_wezlow_z_war_I) += it_wk.h ;
 	}
 }
@@ -285,7 +322,7 @@ void KObliczenia::WypelnijZrodlamiPunktowymi(KUkladRownan* ur)
 					il_wezlow_z_war_I++;
 			}
 		}
-		(*ur->PobierzY())(it_zp.pz->PobierzNumer() - il_wezlow_z_war_I) += it_zp.g;
+		(*ur->PobierzB())(it_zp.pz->PobierzNumer() - il_wezlow_z_war_I) += it_zp.g;
 	}
 }
 
@@ -293,12 +330,35 @@ void KObliczenia::WypelnijZrodlamiRozciaglymi()
 {
 }
 
+void KObliczenia::UstawTemperatureWezlow()
+{
+	unsigned wezlyI = 0;
+	unsigned i = 1;
+	for (auto it_w : *dane->PobierzSiatke()->PobierzWezly())
+	{
+		if (it_w->PobierzTemperature() > 0)
+			continue;
+		it_w->UstawTemperature((*urMES->PobierzX())(i));
+		++i;
+	}
+}
+
+KDane* KObliczenia::PobierzDane()
+{
+	return dane;
+}
+
+KUkladRownan* KObliczenia::PobierzUkladRownan()
+{
+	return urMES;
+}
+
 KMacierz* KObliczenia::PobierzGlobalnaMacierzSztywnosci()
 {
 	return urMES->PobierzA();
 }
 
-KWektor* KObliczenia::PobierzGlobalnyWektorNaprezen()
+KWektorK* KObliczenia::PobierzGlobalnyWektorNaprezen()
 {
-	return urMES->PobierzY();
+	return urMES->PobierzB();
 }

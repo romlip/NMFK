@@ -29,6 +29,8 @@ BEGIN_MESSAGE_MAP(CRAMESView, CView)
 	ON_COMMAND(ID_FILE_PRINT_PREVIEW, &CRAMESView::OnFilePrintPreview)
 	ON_WM_CONTEXTMENU()
 	ON_WM_RBUTTONUP()
+	ON_UPDATE_COMMAND_UI(ID_OBLICZENIA_WYKONAJ, &CRAMESView::OnUpdateObliczeniaWykonaj)
+	ON_UPDATE_COMMAND_UI(ID_WYNIKI_ZAPISZ, &CRAMESView::OnUpdateWynikiZapisz)
 END_MESSAGE_MAP()
 
 // CRAMESView construction/destruction
@@ -126,3 +128,24 @@ CRAMESDoc* CRAMESView::GetDocument() const // non-debug version is inline
 
 
 // CRAMESView message handlers
+
+
+void CRAMESView::OnUpdateObliczeniaWykonaj(CCmdUI* pCmdUI)
+{
+	CRAMESDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+
+	pCmdUI->Enable(pDoc->dane->mDaneFlag);
+	// TODO: Add your command update UI handler code here
+}
+
+
+void CRAMESView::OnUpdateWynikiZapisz(CCmdUI* pCmdUI)
+{
+	// TODO: Add your command update UI handler code here
+	CRAMESDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+
+	pCmdUI->Enable(pDoc->obliczenia->mObliczeniaFlag);
+	// TODO: Add your command update UI handler code here
+}

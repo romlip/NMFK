@@ -49,6 +49,7 @@ protected:
 	// Helper function that sets search content for a Search Handler
 	void SetSearchContent(const CString& value);
 #endif // SHARED_HANDLERS
+
 public:
 	KPlik* plik;
 	KDane* dane;
@@ -59,4 +60,6 @@ public:
 	afx_msg void OnWynikiZapisz();
 
 	afx_msg void OnObliczeniaWykonaj();
+	void ClearFlags();
+	afx_msg void OnWynikiZapiszjako();
 };
