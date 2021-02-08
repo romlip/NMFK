@@ -11,13 +11,12 @@ class KSiatka
 {
 private:
 	int liczba_wezlow_w_elemencie = 2; //liczba wezlow w elemencie
+	float mfXmin, mfXmax;
 	unsigned rozmiar; // liczba wszystkich wezlow siatki
 	std::vector<KWezel1D*> vpWezly; // wektor wskaznikow na wezly siatki
 	std::vector<KElement1D> vElementy; // wektor elementow siatki
-
 	std::vector<KWezel1D*> vpWezly_wczytane; // wektor wskaznikow na wezly wczytane z pliku z uwzglednieniem punktow zrodlowych
 	std::vector<KElement1D> vStruktura; // wektor obszarow
-
 	std::vector<KWezel1D*> vpWezly_zrodlowe;
 
 public:
@@ -28,6 +27,11 @@ public:
 	~KSiatka();
 
 	void UstawLiczbeWezlowWelemencie(int iliczba_wezlow);
+	void UstawXmin(float iXmin);
+	void UstawXmax(float iXmax);
+
+	float PobierzXmin();
+	float PobierzXmax();
 
 	void NumerujWezly();
 

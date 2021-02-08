@@ -62,6 +62,16 @@ void KDane::DodajWezlyWarII()
 
 }
 
+void KDane::ClearDane()
+{
+	if (siatka) delete siatka;
+	warunkiI.clear();
+	warunkiII.clear();
+	warunki_konwekcyjne.clear();
+	zrodla_punktowe.clear();
+	zrodla_rozciagle.clear();
+}
+
 void KDane::DodajWezlyWarKon()
 {
 	for (auto it_wk = warunki_konwekcyjne.begin(); it_wk != warunki_konwekcyjne.end(); ++it_wk)
@@ -101,6 +111,38 @@ void KDane::DodajZrodloRozciagle(strukt_zrodlo_rozciagle& zrodlo_rozciagle)
 	zrodla_rozciagle.push_back(zrodlo_rozciagle);
 }
 
+void KDane::SprawdzPoprawnoscDanych()
+{
+	// sprawdz czy struktura sie wczytala
+	if (siatka->PobierzElementy()->empty())
+	{
+		ClearDane();
+		throw runtime_error("Nie udalo sie wczytac struktury.");
+	}
+
+	// sprawdz czy wspolredne warunkow brzegowych i punktow zrodlowych mieszcza sie w strukturze
+
+
+	//sprawdz spojnosc obszarow
+	for (auto it_e = siatka->PobierzElementy()->begin(); it_e + 1 != siatka->PobierzElementy()->end(); ++it_e)
+	{
+		if ((it_e + 1)->PobierzWezel(1)->PobierzX() != (it_e)->PobierzWezel(2)->PobierzX())
+		{
+			char komunikat[50];
+			sprintf_s(komunikat, "Obszary %d i %d nie sa spojne.", it_e->PobierzNumer(), (it_e + 1)->PobierzNumer());
+			ClearDane();
+			throw runtime_error(komunikat);
+		}
+	}
+
+	// sprawdz czy nie ma wiecej niz 2 warunki brzegowe
+	if (warunkiI.size() + warunkiII.size() + warunki_konwekcyjne.size() > 2)
+	{
+		ClearDane();
+		throw runtime_error("Podano za duzo warunkow brzegowych. Dla struktury 1D nie moze byc ich wiecej niz 2.");
+	}
+}
+
 KSiatka* KDane::PobierzSiatke()
 {
 	return siatka;
@@ -138,10 +180,6 @@ vector<strukt_warunek_konwekcyjny>* KDane::PobierzWarunkiKonwekcyjne()
 
  void KDane::FinalizujWczytywanie()
  {
-	 // sprawdz czy struktura sie wczytala
-	 if (siatka->PobierzWezly()->empty())
-		 throw runtime_error("Nie wczytano struktury");
-
 	 *siatka->PobierzStrukture() = *siatka->PobierzElementy(); 	 // zapisz wczytane elementy jako pierwotna strukture
 
 	 DodajPunktyZrodlowe();	 // dodaj wezly w punktach zrodlowych i wumiesc ich wskazniki w wektorze zrodla_punktowe
@@ -152,8 +190,9 @@ vector<strukt_warunek_konwekcyjny>* KDane::PobierzWarunkiKonwekcyjne()
 	 DodajWezlyWarII();
 	 DodajWezlyWarKon(); // dodaj wskazniki wezlow warunk konwekcyjnego w wektorze warunki_konwekcyjne
 
+	 SprawdzPoprawnoscDanych();
+
 	 siatka->DodajWezlyWewnetrzne();// dodaje wezly wewnatrz elementu
 	 siatka->NumerujWezly();
 
-	 mDaneFlag = true;
  }

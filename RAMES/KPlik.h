@@ -9,7 +9,7 @@ private:
 	char* nazwaPliku;
 	enum enum_spec { STRUKTURA , WARUNKI_BRZEGOWE_I_RODZAJU, WARUNKI_BRZEGOWE_II_RODZAJU, WARUNKI_KONWEKCYJNE, ZRODLA_PUNKTOWE, ZRODLA_ROZCIAGLE, LICZBA_WEZLOW, NAZWA, SKALA }
 	specyfikatory;
-	std::string wynikiDir = "Wyniki/";
+	std::string wynikiDir = "Wyniki\\";
 	const char* start = "START";
 	const char* koniec = "KONIEC";
 

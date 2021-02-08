@@ -153,8 +153,7 @@ KWektorK* KUkladRownan::RozwiazCholesky()
 		throw runtime_error("macierz nie jest dodatnio okreslona");
 
 	unsigned m = A->DajM();
-	unsigned n = A->DajN();
-	KMacierz L(m, n);
+	KMacierz L(m, m);
 
 	// rozklad choleskyego-banachiewicza
 	float suma;

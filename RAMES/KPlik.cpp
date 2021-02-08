@@ -84,7 +84,15 @@ int KPlik::WczytajDane(char* inazwaPliku, KDane* dane)
 			break;
 		}
 	}
-	dane->FinalizujWczytywanie();
+	try {
+		dane->FinalizujWczytywanie();
+		dane->mDaneFlag = true;
+	}
+	catch (exception& e)
+	{
+		MessageBox(NULL, CString(e.what()), _T("Blad wczytywania danych"), MB_OK | MB_ICONWARNING);
+		dane->mDaneFlag = false;
+	}
 
 	return 0;
 }
@@ -173,15 +181,21 @@ void KPlik::CzytajStrukture(ifstream& plik, KDane* dane)
 {
 	string line;
 	unsigned _nr;
-	float _xl, _xp, _k, _f;
+	float xl, xp, _k, _f;
 
 	while (getline(plik, line) && line.find(start) == string::npos && plik.good()) {} //szukamy START
 
 	while (getline(plik, line) && line.find(koniec) == string::npos && plik.good()) // czytamy warunki az do KONIEC
 	{
 		stringstream sline(line);
-		sline >> _nr >> _xl >> _xp >> _k >> _f;
-		dane->siatka->DodajElement(_nr, _xl, _xp, _k, _f);
+		sline >> _nr >> xl >> xp >> _k >> _f;
+
+		if (xl < dane->PobierzSiatke()->PobierzXmin())
+			dane->PobierzSiatke()->UstawXmin(xl);
+		if (xp > dane->PobierzSiatke()->PobierzXmax())
+			dane->PobierzSiatke()->UstawXmax(xp);
+
+		dane->PobierzSiatke()->DodajElement(_nr, xl, xp, _k, _f);
 	}
 }
 

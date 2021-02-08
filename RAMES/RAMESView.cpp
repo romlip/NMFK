@@ -31,6 +31,7 @@ BEGIN_MESSAGE_MAP(CRAMESView, CView)
 	ON_WM_RBUTTONUP()
 	ON_UPDATE_COMMAND_UI(ID_OBLICZENIA_WYKONAJ, &CRAMESView::OnUpdateObliczeniaWykonaj)
 	ON_UPDATE_COMMAND_UI(ID_WYNIKI_ZAPISZ, &CRAMESView::OnUpdateWynikiZapisz)
+	ON_UPDATE_COMMAND_UI(ID_WYNIKI_ZAPISZJAKO, &CRAMESView::OnUpdateWynikiZapiszjako)
 END_MESSAGE_MAP()
 
 // CRAMESView construction/destruction
@@ -148,4 +149,13 @@ void CRAMESView::OnUpdateWynikiZapisz(CCmdUI* pCmdUI)
 
 	pCmdUI->Enable(pDoc->obliczenia->mObliczeniaFlag);
 	// TODO: Add your command update UI handler code here
+}
+
+
+void CRAMESView::OnUpdateWynikiZapiszjako(CCmdUI* pCmdUI)
+{
+	CRAMESDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+
+	pCmdUI->Enable(pDoc->obliczenia->mObliczeniaFlag);
 }

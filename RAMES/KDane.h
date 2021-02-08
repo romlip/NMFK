@@ -58,12 +58,15 @@ public:
 	void DodajWezlyWarI();
 	void DodajWezlyWarII();
 
+	void ClearDane();
 	void DodajWezlyWarKon();
 	void DodajWarunekI(strukt_warunekI& warunekI);
 	void DodajWarunekII(strukt_warunekII& warunekII);
 	void DodajWarunekKonwekcyjny(strukt_warunek_konwekcyjny& warunek_konwekcyjny);
 	void DodajZrodloPunktowe(strukt_zrodlo_punktowe& zrodlo);
 	void DodajZrodloRozciagle(strukt_zrodlo_rozciagle& zrodlo_rozciagle);
+
+	void SprawdzPoprawnoscDanych();
 
 	std::vector<strukt_warunekI>* PobierzWarunkiI();
 	std::vector<strukt_warunekII>* PobierzWarunkiII();

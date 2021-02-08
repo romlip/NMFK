@@ -84,6 +84,8 @@ KWezel1D* KSiatka::DodajWezel(float x)
 KSiatka::KSiatka() {
 
     rozmiar = 0;
+    mfXmax = 0;
+    mfXmin = 0;
 }
 
 //KSiatka::KSiatka(char*  nazwa_pliku) {
@@ -171,6 +173,26 @@ KSiatka::~KSiatka() {
 void KSiatka::UstawLiczbeWezlowWelemencie(int iliczba_wezlow)
 {
     liczba_wezlow_w_elemencie = iliczba_wezlow;
+}
+
+void KSiatka::UstawXmin(float iXmin)
+{
+    mfXmin = iXmin;
+}
+
+void KSiatka::UstawXmax(float iXmax)
+{
+    mfXmax = iXmax;
+}
+
+float KSiatka::PobierzXmin()
+{
+    return mfXmin;
+}
+
+float KSiatka::PobierzXmax()
+{
+    return mfXmax;
 }
 
 void KSiatka::NumerujWezly()
