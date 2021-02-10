@@ -72,6 +72,12 @@
     <ClInclude Include="KWektor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DlgObliczeniaUstawienia.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KMacierzSPF.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RAMES.cpp">
@@ -120,6 +126,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="KWektor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgObliczeniaUstawienia.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="KMacierzSPF.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -23,12 +23,6 @@ struct strukt_warunek_konwekcyjny {
 	KWezel1D* wk;
 };
 
-struct strukt_zrodlo_punktowe{
-	float x;
-	float g;
-	KWezel1D* pz;
-};
-
 struct strukt_zrodlo_rozciagle{
 	float xl;
 	float xp;
@@ -38,6 +32,8 @@ struct strukt_zrodlo_rozciagle{
 class KDane
 {
 private:
+	bool mbWarunkiIanalityczne;
+	bool mbWarunkiIpeynIrons;
 	std::vector<strukt_warunekI> warunkiI;
 	std::vector<strukt_warunekII> warunkiII;
 	std::vector<strukt_warunek_konwekcyjny> warunki_konwekcyjne;
@@ -54,7 +50,6 @@ public:
 	~KDane();
 
 	void FinalizujWczytywanie();
-	void DodajPunktyZrodlowe();
 	void DodajWezlyWarI();
 	void DodajWezlyWarII();
 
@@ -63,7 +58,6 @@ public:
 	void DodajWarunekI(strukt_warunekI& warunekI);
 	void DodajWarunekII(strukt_warunekII& warunekII);
 	void DodajWarunekKonwekcyjny(strukt_warunek_konwekcyjny& warunek_konwekcyjny);
-	void DodajZrodloPunktowe(strukt_zrodlo_punktowe& zrodlo);
 	void DodajZrodloRozciagle(strukt_zrodlo_rozciagle& zrodlo_rozciagle);
 
 	void SprawdzPoprawnoscDanych();
@@ -71,7 +65,6 @@ public:
 	std::vector<strukt_warunekI>* PobierzWarunkiI();
 	std::vector<strukt_warunekII>* PobierzWarunkiII();
 	std::vector<strukt_warunek_konwekcyjny>* PobierzWarunkiKonwekcyjne();
-	std::vector<strukt_zrodlo_punktowe>* PobierzZrodlaPunktowe() ;
 	std::vector<strukt_zrodlo_rozciagle>* PobierzZrodlaRozciagle();
 	std::vector<strukt_warunekI>* PobierzWezlyWarI();
 	KSiatka* PobierzSiatke();

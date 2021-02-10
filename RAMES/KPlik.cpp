@@ -157,7 +157,7 @@ void KPlik::CzytajZrodlaPunktowe(ifstream& plik, KDane* dane)
 		stringstream sline(line);
 		sline >> x >> g;
 		strukt_zrodlo_punktowe zrodlo = { x, g, nullptr };
-		dane->DodajZrodloPunktowe(zrodlo);
+		dane->PobierzSiatke()->DodajZrodloPunktowe(zrodlo);
 	}
 }
 

@@ -74,6 +74,58 @@ void KSiatka::DodajWezlyWewnetrzne()
     }
 }
 
+void KSiatka::ZagescWstepnie()
+{
+    if (mbZagescWstepnie)
+    {
+        bool bWstawiono = false;
+        while (!bWstawiono)
+        {
+            bWstawiono = false;
+            for (auto it_e = vElementy.begin(); (it_e + 1) != vElementy.end(); ++it_e)
+            {
+                if (it_e->Pobierzh() > mfWspolczynnikZageszczania * (it_e + 1)->Pobierzh())
+                {
+                    KWezel1D* pNowyWezel = DodajWezel(it_e->PobierzWezel(1)->PobierzX() + it_e->Pobierzh() / 2.);
+                    WstawElementZa(pNowyWezel);
+                    bWstawiono = true;
+                }
+                else if (mfWspolczynnikZageszczania * it_e->Pobierzh() < (it_e + 1)->Pobierzh())
+                {
+                    KWezel1D* pNowyWezel = DodajWezel((it_e + 1)->PobierzWezel(1)->PobierzX() + (it_e + 1)->Pobierzh() / 2.);
+                    WstawElementZa(pNowyWezel);
+                    bWstawiono = true;
+                }
+                if (bWstawiono)
+                    break;
+            }
+        }
+    }
+}
+
+void KSiatka::Finalizuj()
+{
+    vpWezly_wczytane = vpWezly; // zapisz wczytane wezly i punkty zrodlowe jako pierwotne
+    vStruktura = vElementy; // zapisz wczytane elementy jako pierwotna strukture
+
+    DodajPunktyZrodlowe();	 // dodaj wezly w punktach zrodlowych i wumiesc ich wskazniki w wektorze mvPunktyZrodlowe
+    NumerujWezly();
+}
+
+void KSiatka::Zagesc()
+{
+    for (unsigned i(0); i < muKrotnoscZageszczenia; ++i)
+    {
+        unsigned liczbaElementow = vElementy.size();
+        for (unsigned j(0); j < liczbaElementow; ++j)
+        {
+            auto it_e = vElementy.begin() + 2 * j;
+            KWezel1D* pNowyWezel = DodajWezel(it_e->PobierzWezel(1)->PobierzX() + it_e->Pobierzh() / 2.);
+            WstawElementZa(pNowyWezel);
+        }
+    }
+}
+
 KWezel1D* KSiatka::DodajWezel(float x)
 {
     KWezel1D* w = new KWezel1D((unsigned)vpWezly.size() + 1, x);
@@ -82,8 +134,10 @@ KWezel1D* KSiatka::DodajWezel(float x)
 }
 
 KSiatka::KSiatka() {
-
-    rozmiar = 0;
+    liczba_wezlow_w_elemencie = 2;
+    mfWspolczynnikZageszczania = 3;
+    mbZagescWstepnie = false;
+    muKrotnoscZageszczenia = 0;
     mfXmax = 0;
     mfXmin = 0;
 }
@@ -117,6 +171,39 @@ void KSiatka::DodajElement(unsigned inr, float ixl, float ixp, float ik, float i
     vElementy.emplace_back(KElement1D(inr, pxl, pxp, ik, iif)); //dodaj element na koncu
 }
 
+void KSiatka::DodajZrodloPunktowe(strukt_zrodlo_punktowe& zrodlo)
+{
+   mvPunktyZrodlowe.push_back(zrodlo);
+}
+
+void KSiatka::DodajPunktyZrodlowe()
+{
+    // stworz wektor wskaznikow na wezly bedace zrodlami punktowymi; sluzy do wypelnienia globalnego wektora naprezen
+    for (auto it_zp = mvPunktyZrodlowe.begin(); it_zp != mvPunktyZrodlowe.end(); ++it_zp)
+    {
+        float x_zrodla = it_zp->x;
+        KWezel1D* punkt_zrodlowy = WezelIstnieje(x_zrodla);
+        if (punkt_zrodlowy == nullptr)
+        {
+            punkt_zrodlowy = DodajWezel(x_zrodla); // stworz nowy wezel w x
+            WstawElementZa(punkt_zrodlowy);
+        }
+        it_zp->pz = punkt_zrodlowy;
+    }
+}
+
+void KSiatka::Generuj()
+{
+    vpWezly = vpWezly_wczytane;
+    vElementy = vStruktura;
+
+    DodajPunktyZrodlowe();
+    ZagescWstepnie();
+    Zagesc();
+    DodajWezlyWewnetrzne();// dodaje wezly wewnatrz elementu
+    NumerujWezly();
+}
+
 int KSiatka::PobierzLiczbeWezlowWelemencie()
 {
     return liczba_wezlow_w_elemencie;
@@ -145,6 +232,11 @@ std::vector<KElement1D>* KSiatka::PobierzStrukture()
 std::vector<KElement1D>* KSiatka::PobierzElementy()
 {
     return &vElementy;
+}
+
+std::vector<strukt_zrodlo_punktowe>* KSiatka::PobierzZrodlaPunktowe()
+{
+    return &mvPunktyZrodlowe;
 }
 
 KSiatka::~KSiatka() {
@@ -183,6 +275,16 @@ void KSiatka::UstawXmin(float iXmin)
 void KSiatka::UstawXmax(float iXmax)
 {
     mfXmax = iXmax;
+}
+
+void KSiatka::UstawZageszczanieWstepne(bool czy)
+{
+    mbZagescWstepnie = czy;
+}
+
+void KSiatka::UstawKrotnoscZageszczenia(unsigned krotnosc)
+{
+    muKrotnoscZageszczenia = krotnosc;
 }
 
 float KSiatka::PobierzXmin()

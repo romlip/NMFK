@@ -19,12 +19,12 @@ public:
 	KMacierz(unsigned im, unsigned in, const float* tablica);
 	~KMacierz();
 
-	void Zeros();
+	virtual void Zeros();
 	inline unsigned DajM();
 	inline unsigned DajN();
 	float DajIJ(unsigned i, unsigned j);
-	bool DodatnioOkreslona();
-	void Wypisz(std::ostream &out);
+	virtual bool DodatnioOkreslona();
+	virtual void Wypisz(std::ostream &out);
 
 	float& operator()(unsigned i, unsigned j);
 

@@ -12,6 +12,7 @@
 
 #include "RAMESDoc.h"
 #include "RAMESView.h"
+#include "DlgObliczeniaUstawienia.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -32,6 +33,8 @@ BEGIN_MESSAGE_MAP(CRAMESView, CView)
 	ON_UPDATE_COMMAND_UI(ID_OBLICZENIA_WYKONAJ, &CRAMESView::OnUpdateObliczeniaWykonaj)
 	ON_UPDATE_COMMAND_UI(ID_WYNIKI_ZAPISZ, &CRAMESView::OnUpdateWynikiZapisz)
 	ON_UPDATE_COMMAND_UI(ID_WYNIKI_ZAPISZJAKO, &CRAMESView::OnUpdateWynikiZapiszjako)
+	ON_COMMAND(ID_OBLICZENIA_USTAWIENIA, &CRAMESView::OnObliczeniaUstawienia)
+	ON_UPDATE_COMMAND_UI(ID_OBLICZENIA_USTAWIENIA, &CRAMESView::OnUpdateObliczeniaUstawienia)
 END_MESSAGE_MAP()
 
 // CRAMESView construction/destruction
@@ -158,4 +161,38 @@ void CRAMESView::OnUpdateWynikiZapiszjako(CCmdUI* pCmdUI)
 	ASSERT_VALID(pDoc);
 
 	pCmdUI->Enable(pDoc->obliczenia->mObliczeniaFlag);
+}
+
+
+void CRAMESView::OnObliczeniaUstawienia()
+{
+	CRAMESDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+
+	DlgObliczeniaUstawienia dlgObliczeniaUstawienia;
+
+	int result = dlgObliczeniaUstawienia.DoModal();
+
+	if (result == IDOK)
+	{
+		// zageszczanie siatki
+		pDoc->dane->PobierzSiatke()->UstawZageszczanieWstepne(dlgObliczeniaUstawienia.mbZagescWstepnie);
+		pDoc->dane->PobierzSiatke()->UstawKrotnoscZageszczenia(dlgObliczeniaUstawienia.mKrotnoscZageszczenia);
+		pDoc->dane->PobierzSiatke()->Generuj();
+
+		// ustawienia obliczen
+		pDoc->obliczenia->UstawUwzglednianieWarunkowI(dlgObliczeniaUstawienia.mComboBoxWarunkiSelection);
+		//pDoc->dane->
+
+		Invalidate();
+	}
+	// TODO: Add your command handler code here
+}
+
+void CRAMESView::OnUpdateObliczeniaUstawienia(CCmdUI* pCmdUI)
+{
+	CRAMESDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+
+	pCmdUI->Enable(pDoc->dane->mDaneFlag);
 }

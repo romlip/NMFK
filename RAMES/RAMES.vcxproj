@@ -183,10 +183,12 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DlgObliczeniaUstawienia.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="KDane.h" />
     <ClInclude Include="KElement1D.h" />
     <ClInclude Include="KMacierz.h" />
+    <ClInclude Include="KMacierzSPF.h" />
     <ClInclude Include="KMacierzSRF.h" />
     <ClInclude Include="KObliczenia.h" />
     <ClInclude Include="KPlik.h" />
@@ -204,9 +206,11 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DlgObliczeniaUstawienia.cpp" />
     <ClCompile Include="KDane.cpp" />
     <ClCompile Include="KElement1D.cpp" />
     <ClCompile Include="KMacierz.cpp" />
+    <ClCompile Include="KMacierzSPF.cpp" />
     <ClCompile Include="KMacierzSRF.cpp" />
     <ClCompile Include="KObliczenia.cpp" />
     <ClCompile Include="KPlik.cpp" />
