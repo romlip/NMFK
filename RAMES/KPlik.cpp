@@ -80,6 +80,8 @@ int KPlik::WczytajDane(char* inazwaPliku, KDane* dane)
 		case NAZWA:
 			CzytajNazwe(pliczek, dane, line);
 			break;
+		case SKALA:
+			CzytajSkale(pliczek, dane, line);
 		default:
 			break;
 		}
@@ -100,7 +102,7 @@ int KPlik::WczytajDane(char* inazwaPliku, KDane* dane)
 void KPlik::CzytajWarunkiI(ifstream& plik, KDane* dane)
 {
 	string line;
-	float x, T;
+	double x, T;
 
 	while (getline(plik, line) && line.find(start) == string::npos && plik.good()) {} //szukamy START
 	
@@ -116,7 +118,7 @@ void KPlik::CzytajWarunkiI(ifstream& plik, KDane* dane)
 void KPlik::CzytajWarunkiII(std::ifstream& plik, KDane* dane)
 {
 	string line;
-	float x, q;
+	double x, q;
 
 	while (getline(plik, line) && line.find(start) == string::npos && plik.good()) {} //szukamy START
 
@@ -132,7 +134,7 @@ void KPlik::CzytajWarunkiII(std::ifstream& plik, KDane* dane)
 void KPlik::CzytajWarunkiKonwekcyjne(std::ifstream& plik, KDane* dane)
 {
 	string line;
-	float x, h, T_inf;
+	double x, h, T_inf;
 
 	while (getline(plik, line) && line.find(start) == string::npos && plik.good()) {} //szukamy START
 
@@ -148,7 +150,7 @@ void KPlik::CzytajWarunkiKonwekcyjne(std::ifstream& plik, KDane* dane)
 void KPlik::CzytajZrodlaPunktowe(ifstream& plik, KDane* dane)
 {
 	string line;
-	float x, g;
+	double x, g;
 
 	while (getline(plik, line) && line.find(start) == string::npos && plik.good()) {} //szukamy START
 
@@ -164,7 +166,7 @@ void KPlik::CzytajZrodlaPunktowe(ifstream& plik, KDane* dane)
 void KPlik::CzytajZrodlaRozciagle(std::ifstream& plik, KDane* dane)
 {
 	string line;
-	float x, g;
+	double x, g;
 
 	while (getline(plik, line) && line.find(start) == string::npos && plik.good()) {} //szukamy START
 
@@ -181,7 +183,7 @@ void KPlik::CzytajStrukture(ifstream& plik, KDane* dane)
 {
 	string line;
 	unsigned _nr;
-	float xl, xp, _k, _f;
+	double xl, xp, _k, _f;
 
 	while (getline(plik, line) && line.find(start) == string::npos && plik.good()) {} //szukamy START
 
@@ -213,6 +215,15 @@ void KPlik::CzytajNazwe(ifstream& plik, KDane* dane, string& line)
 	stringstream sline(line);
 	string specyf;
 	sline >> specyf >> nazwaStruktury;
+}
+
+void KPlik::CzytajSkale(std::ifstream& pliczek, KDane* dane, std::string& line)
+{
+	stringstream sline(line);
+	string specyf;
+	double skala;
+	sline >> specyf >> skala;
+	dane->UstawSkale(skala);
 }
 
 void KPlik::ZapiszWynik(KDane* dane, KObliczenia* obliczenia, const char* inazwaPliku)
@@ -256,10 +267,10 @@ void KPlik::ZapiszWynik(KDane* dane, KObliczenia* obliczenia, const char* inazwa
 
 	//obliczenia->PobierzUkladRownan()->PobierzX()->Wypisz(plik);
 
-	////float tab1[][2] = { {7,2}, {3,-2}, {5,-5} };
-	////KMacierz A(3,2, (float*)tab1);
-	////float tab2[][3] = { {-11,2, 2}, {-2,1, 5} };
-	////KMacierz B(2, 3, (float*)tab2);
+	////double tab1[][2] = { {7,2}, {3,-2}, {5,-5} };
+	////KMacierz A(3,2, (double*)tab1);
+	////double tab2[][3] = { {-11,2, 2}, {-2,1, 5} };
+	////KMacierz B(2, 3, (double*)tab2);
 
 	////KMacierz C = A * B;
 	////KMacierz D = C.Inverse();

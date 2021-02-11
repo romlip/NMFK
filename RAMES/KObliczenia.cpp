@@ -10,6 +10,7 @@ using namespace std;
 
 KObliczenia::KObliczenia()
 {
+	mWyniki = 0;
 	eWarunkiI = PAYNE_IRONS;
 	mObliczeniaFlag = false;
 	dane = new KDane();
@@ -22,6 +23,16 @@ KObliczenia::~KObliczenia()
 	if (dane) delete dane;
 }
 
+void KObliczenia::UstawWynikiTylkoWezly(int wyniki)
+{
+	mWyniki = wyniki;
+}
+
+void KObliczenia::UstawWynikiGestoscAproksymacji(int gestosc)
+{
+	mGestoscAproksymacji = gestosc;
+}
+
 KMacierz* KObliczenia::StworzLokalnaMacierzSztywnosci(KElement1D* element)
 {
 	KMacierz* k = nullptr;
@@ -30,14 +41,14 @@ KMacierz* KObliczenia::StworzLokalnaMacierzSztywnosci(KElement1D* element)
 	{
 	case 2:
 	{
-		float kk[][2] = { {1,-1}, {-1,1} };
-		k = new KMacierz(2, (float*)kk);
+		double kk[][2] = { {1,-1}, {-1,1} };
+		k = new KMacierz(2, (double*)kk);
 		(*k) *= element->Pobierzk() / element->Pobierzh();
 		break; }
 	case 3:
 	{
-		float k3[][3] = { {7,-8, 1}, {-8, 16, -8}, {1, -8, 7} };
-		k = new KMacierz(3, (float*)k3);
+		double k3[][3] = { {7,-8, 1}, {-8, 16, -8}, {1, -8, 7} };
+		k = new KMacierz(3, (double*)k3);
 		(*k) *= element->Pobierzk() / 3. / element->Pobierzh();
 		break;
 	}
@@ -55,19 +66,20 @@ KWektorK* KObliczenia::StworzLokalnyWektorNaprezen(KElement1D* element)
 	{
 	case 2:
 	{
-		float pp[2] = { 1,1 };
-		p = new KWektorK(2, (float*)pp);
+		double pp[2] = { 1,1 };
+		p = new KWektorK(2, (double*)pp);
+		(*p) *= (double)element->Pobierzh() * element->Pobierzf() * 0.5 ; // 0.5*f*h* [1,1]
 		break;
 	}
 	case 3:
 	{
-		float pp[3] = {1,4,1 };
-		p = new KWektorK(3, (float*)pp);
+		double pp[3] = {1,4,1 };
+		p = new KWektorK(3, (double*)pp);
 		(*p) *= (double)element->Pobierzh() * element->Pobierzf() / 6.;
 		break;
 	}
 	}
-	(*p) *= element->Pobierzh() * element->Pobierzf() * 0.5 ; // 0.5*f*h* [1,1]
+	//(*p) *= element->Pobierzh() * element->Pobierzf() * 0.5 ; // 0.5*f*h* [1,1]
 
 	return p;
 }
@@ -142,7 +154,7 @@ void KObliczenia::WypelnijUkladRownan(KElement1D* e)
 	switch (eWarunkiI)
 	{
 	case REDUKCJA:
-		WypelnijUkladRownanAnalitycznie(e);
+		WypelnijUkladRownanRedukcja(e);
 		break;
 	case PAYNE_IRONS:
 		WypelnijUkladRownanPayneIrons(e);
@@ -158,13 +170,13 @@ void KObliczenia::WypelnijKWarunkamiBrzegowymi()
 	//WypelnijWarunkamiIIRodzaju();
 }
 
-void KObliczenia::WypelnijUkladRownanAnalitycznie(KElement1D* e)
+void KObliczenia::WypelnijUkladRownanRedukcja(KElement1D* e)
 {
 	KMacierz* k_e = StworzLokalnaMacierzSztywnosci(e);
 	KWektorK* p_e = StworzLokalnyWektorNaprezen(e);
 
 	unsigned globalny_nr;
-	float wyraz_warI;
+	double wyraz_warI;
 
 	// okresl ktore wezly w elemencie sa warunkami brzegowymi I rodzaju; sluzy do redukcji ilosci rownan
 	vector<unsigned> wezly_war_I; //wektor numerow wezlow elementu bedacych warunkami I rodzaju
@@ -223,8 +235,8 @@ void KObliczenia::WypelnijUkladRownanPayneIrons(KElement1D* e)
 	KWektorK* p_e = StworzLokalnyWektorNaprezen(e);
 
 	unsigned globalny_nr;
-	const float stalaMnoznika = 1.0e8;
-	float mnoznik;
+	const double stalaMnoznika = 1.0e8;
+	double mnoznik;
 
 	// okresl ktore wezly w elemencie sa warunkami brzegowymi I rodzaju
 	vector<unsigned> wezly_war_I; //wektor numerow wezlow elementu bedacych warunkami I rodzaju
@@ -321,6 +333,7 @@ KWektorK* KObliczenia::Licz(KDane* idane)
 	// rozwiaz uklad rownan
 	urMES->Rozwiaz();
 	UstawTemperatureWezlow();
+	//dane->OdstosujSkale();
 	mObliczeniaFlag = true;
 
 	return urMES->PobierzX();
@@ -328,20 +341,19 @@ KWektorK* KObliczenia::Licz(KDane* idane)
 
 void KObliczenia::WypiszWynik(ostream& iplik, bool tylkoWezly)
 {
-	tylkoWezly = false;
-	iplik << "x\tT\n";
+	UstawFormatWynikow(iplik);
+	iplik << "x [m * "<< dane->PobierzSkale() << "]" << "\t\t" << "T [K]" << "\n";
 
-	if (tylkoWezly)
+	if (mWyniki == 0)
 	{
 		for (auto it_w : *dane->PobierzSiatke()->PobierzWezly())
 		{
-			iplik << setprecision(6) << it_w->PobierzX() << "\t" << it_w->PobierzTemperature() << "\n";
+			iplik << it_w->PobierzX() << "\t" << it_w->PobierzTemperature() << "\n";
 		}
 	}
-	else
+	else if (mWyniki == 1)
 	{
-		int gestosc = 6;
-		float X, Xi, Xj, Xk, Ti, Tj, Tk, dx, TT;
+		double X, Xi, Xj, Xk, Ti, Tj, Tk, dx, TT;
 
 		if (dane->PobierzSiatke()->PobierzLiczbeWezlowWelemencie() == 2)
 		{
@@ -352,16 +364,16 @@ void KObliczenia::WypiszWynik(ostream& iplik, bool tylkoWezly)
 				Ti = it_e.PobierzWezel(1)->PobierzTemperature();
 				Tj = it_e.PobierzWezel(2)->PobierzTemperature();
 
-				dx = it_e.Pobierzh() / gestosc;
+				dx = it_e.Pobierzh() / mGestoscAproksymacji;
 
-				for (int i(0); i < gestosc; ++i)
+				for (int i(0); i < mGestoscAproksymacji; ++i)
 				{
 					X = Xi + i * dx;
 					TT = T2(X, Xi, Ti, Xj, Tj);
-					iplik << setprecision(6) << X << "\t" << TT << "\n";
+					iplik << X  << TT << "\n";
 				}
 			}
-			iplik << setprecision(6) << (dane->PobierzSiatke()->PobierzElementy()->end() - 1)->PobierzWezel(2)->PobierzX() << "\t" << (dane->PobierzSiatke()->PobierzElementy()->end() - 1)->PobierzWezel(2)->PobierzTemperature() << "\n";
+			iplik << (dane->PobierzSiatke()->PobierzElementy()->end() - 1)->PobierzWezel(2)->PobierzX() << "\t" << (dane->PobierzSiatke()->PobierzElementy()->end() - 1)->PobierzWezel(2)->PobierzTemperature() << "\n";
 		}
 		else
 		{
@@ -374,18 +386,17 @@ void KObliczenia::WypiszWynik(ostream& iplik, bool tylkoWezly)
 				Tj = it_e.PobierzWezel(2)->PobierzTemperature();
 				Tk = it_e.PobierzWezel(3)->PobierzTemperature();
 
-				dx = it_e.Pobierzh() / gestosc;
+				dx = it_e.Pobierzh() / mGestoscAproksymacji;
 
-				for (int i(0); i < gestosc; ++i)
+				for (int i(0); i < mGestoscAproksymacji; ++i)
 				{
 					X = Xi + i * dx;
 					TT = T3(X, Xi, Ti, Xj, Tj, Xk, Tk);
-					iplik << setprecision(6) << X << "\t" << TT << "\n";
+					iplik  << X << "\t" << TT << "\n";
 				}
 			}
-			iplik << setprecision(6) << (dane->PobierzSiatke()->PobierzElementy()->end() - 1)->PobierzWezel(3)->PobierzX() << "\t" << (dane->PobierzSiatke()->PobierzElementy()->end() - 1)->PobierzWezel(3)->PobierzTemperature() << "\n";
+			iplik << (dane->PobierzSiatke()->PobierzElementy()->end() - 1)->PobierzWezel(3)->PobierzX() << "\t" << (dane->PobierzSiatke()->PobierzElementy()->end() - 1)->PobierzWezel(3)->PobierzTemperature() << "\n";
 		}
-
 	}
 }
 
@@ -394,7 +405,6 @@ void KObliczenia::UstawUwzglednianieWarunkowI(int uwzglednianieWarunkowI)
 	eWarunkiI = EwarunkiI(uwzglednianieWarunkowI);
 }
 
-
 void KObliczenia::WypelnijWarunkamiIRodzaju()
 {
 }
@@ -402,7 +412,7 @@ void KObliczenia::WypelnijWarunkamiIRodzaju()
 void KObliczenia::WypelnijWarunkamiIIRodzaju(KUkladRownan* ur)
 {
 	unsigned il_wezlow_z_war_I = 0;
-	float q;
+	double q;
 
 	for (auto it_wII : *dane->PobierzWarunkiII())
 	{
@@ -425,7 +435,7 @@ void KObliczenia::WypelnijWarunkamiIIRodzaju(KUkladRownan* ur)
 void KObliczenia::WypelnijWarunkamiKonwekcyjnymi(KUkladRownan* ur)
 {
 	unsigned il_wezlow_z_war_I = 0;
-	float h, T_inf;
+	double h, T_inf;
 
 	for (auto it_wk : *dane->PobierzWarunkiKonwekcyjne())
 	{
@@ -489,6 +499,11 @@ void KObliczenia::UstawTemperatureWezlow()
 		it_w->UstawTemperature((*urMES->PobierzX())(i));
 		++i;
 	}
+}
+
+void KObliczenia::UstawFormatWynikow(std::ostream& stream)
+{
+	stream << fixed << setprecision(6);
 }
 
 KDane* KObliczenia::PobierzDane()

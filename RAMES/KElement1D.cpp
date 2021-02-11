@@ -12,7 +12,7 @@ KElement1D::KElement1D() {
 	numer = 0;
 }
 
-KElement1D::KElement1D(unsigned inumer, KWezel1D* ilewy, KWezel1D* iprawy, float ik, float iff) {
+KElement1D::KElement1D(unsigned inumer, KWezel1D* ilewy, KWezel1D* iprawy, double ik, double iff) {
 	numer = inumer;
 	k = ik;
 	f = iff;
@@ -60,21 +60,21 @@ KWezel1D* KElement1D::PobierzWezel(int ity_wezel)
 	return vpWezly[ity_wezel - 1];
 }
 
-float KElement1D::Pobierzh()
+double KElement1D::Pobierzh()
 {
 	return (*(vpWezly.end() - 1))->PobierzX() - (*(vpWezly.begin()))->PobierzX();
 }
 
-float KElement1D::Pobierzk()
+double KElement1D::Pobierzk()
 {
 	return k;
 }
 
-float KElement1D::Pobierzf()
+double KElement1D::Pobierzf()
 {
 	return f;
 }
 
-float KElement1D::PobierzT() {
+double KElement1D::PobierzT() {
 	return 0;
 }

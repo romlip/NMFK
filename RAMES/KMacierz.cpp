@@ -20,7 +20,7 @@ KMacierz::KMacierz(const KMacierz & copy)
 {
         m = copy.m;
         n = copy.n;
-        M = new float[static_cast<unsigned long long>(m) * n];
+        M = new double[static_cast<unsigned long long>(m) * n];
         for (unsigned i(0); i < m; ++i)
             for (unsigned j(0); j < n; ++j)
                 M[i * n + j] = copy.M[i * n + j];
@@ -43,7 +43,7 @@ KMacierz::KMacierz(int im, int in)
     Stworz();
 }
 
-KMacierz::KMacierz(unsigned rozmiar, const float* tablica) : KMacierz(rozmiar, rozmiar)
+KMacierz::KMacierz(unsigned rozmiar, const double* tablica) : KMacierz(rozmiar, rozmiar)
 {
     for (unsigned i(0); i < rozmiar; ++i)
     {
@@ -54,7 +54,7 @@ KMacierz::KMacierz(unsigned rozmiar, const float* tablica) : KMacierz(rozmiar, r
     }
 }
 
-KMacierz::KMacierz(unsigned im, unsigned in, const float* tablica): KMacierz(im, in)
+KMacierz::KMacierz(unsigned im, unsigned in, const double* tablica): KMacierz(im, in)
 {
     for (unsigned i(0); i < m; ++i)
     {
@@ -75,14 +75,14 @@ KMacierz::~KMacierz()
 
 void KMacierz::Stworz()
 {
-    M = new float[static_cast<unsigned long long>(m) * n]{ 0 };
+    M = new double[static_cast<unsigned long long>(m) * n]{ 0 };
 }
 
 ////////////////////////////////////////////////////////////
 // Zwraca element (i, j) macierzy. Indeksy zaczynaja sie od 1,
 // nie od 0!
 
-float& KMacierz::operator()(unsigned i, unsigned j)
+double& KMacierz::operator()(unsigned i, unsigned j)
 {
     if (i > m || j > n || i < 1 || j < 1)
     {
@@ -94,7 +94,7 @@ float& KMacierz::operator()(unsigned i, unsigned j)
 //////////////////////////////////////////////////////////////
 // Skopiowanie tablicy do macierzy
 
-KMacierz& KMacierz::operator=( float** const tablica2D)
+KMacierz& KMacierz::operator=( double** const tablica2D)
 {
     for (unsigned i = 0; i < m; i++)
     {
@@ -115,7 +115,7 @@ KMacierz& KMacierz::operator=(const KMacierz& iM)
 
     m = iM.m;
     n = iM.n;
-    M = new float[static_cast<unsigned long long>(m) * n]{ 0 };
+    M = new double[static_cast<unsigned long long>(m) * n]{ 0 };
 
     for (unsigned i{ 0 }; i < m; ++i) {
         for (unsigned j{ 0 }; j < n; ++j)
@@ -134,7 +134,7 @@ KMacierz KMacierz::operator*(const KMacierz& iM)
         throw runtime_error("zly rozmiar macierzy");
 
     KMacierz pro(m, iM.n);
-    float buff = 0.0;
+    double buff = 0.0;
     for (unsigned i{ 0 }; i < m; ++i) {
         for (unsigned j{ 0 }; j < iM.n; ++j) {
             buff = 0.0;
@@ -170,7 +170,7 @@ KMacierz KMacierz::operator-(const KMacierz& iM)
     return dif;
 }
 
-KMacierz KMacierz::operator*(float iskalar)
+KMacierz KMacierz::operator*(double iskalar)
 {
     KMacierz pro(m, n);
     for (unsigned i{ 0 }; i < m; ++i)
@@ -182,7 +182,7 @@ KMacierz KMacierz::operator*(float iskalar)
 ///////////////////////////////////////////////////////////
 // Mnozenie macierzy przez stala
 
-KMacierz& KMacierz::operator*=(float a)
+KMacierz& KMacierz::operator*=(double a)
 {
     for (unsigned i = 0; i < m; i++)
     {
@@ -194,7 +194,7 @@ KMacierz& KMacierz::operator*=(float a)
     return *this;
 }
 
-KMacierz& KMacierz::operator+=(float a)
+KMacierz& KMacierz::operator+=(double a)
 {
     for (unsigned i = 0; i < m; i++)
     {
@@ -213,7 +213,7 @@ KMacierz& KMacierz::operator+=(float a)
 //
 //}
 
-bool KMacierz::operator!=(float iskalar)
+bool KMacierz::operator!=(double iskalar)
 {
     bool bul = false;
     for (unsigned i{ 0 }; i < DajM(); ++i) {
@@ -245,7 +245,7 @@ inline unsigned KMacierz::DajN()
     return n;
 }
 
-float KMacierz::DajIJ(unsigned i, unsigned j)
+double KMacierz::DajIJ(unsigned i, unsigned j)
 {
     if (i > m || j > n)
         throw runtime_error("Zly indeks");

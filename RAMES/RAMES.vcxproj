@@ -184,6 +184,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="DlgObliczeniaUstawienia.h" />
+    <ClInclude Include="DlgWynikiUstawienia.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="KDane.h" />
     <ClInclude Include="KElement1D.h" />
@@ -207,6 +208,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DlgObliczeniaUstawienia.cpp" />
+    <ClCompile Include="DlgWynikiUstawienia.cpp" />
     <ClCompile Include="KDane.cpp" />
     <ClCompile Include="KElement1D.cpp" />
     <ClCompile Include="KMacierz.cpp" />

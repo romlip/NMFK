@@ -5,33 +5,34 @@
 #include "KSiatka.h"
 
 struct strukt_warunekI {
-	float x;
-	float T;
+	double x;
+	double T;
 	KWezel1D* pw;
 };
 
 struct strukt_warunekII {
-	float x;
-	float q;
+	double x;
+	double q;
 	KWezel1D* pWii;
 };
 
 struct strukt_warunek_konwekcyjny {
-	float x;
-	float h;
-	float T_inf;
+	double x;
+	double h;
+	double T_inf;
 	KWezel1D* wk;
 };
 
 struct strukt_zrodlo_rozciagle{
-	float xl;
-	float xp;
-	float g;
+	double xl;
+	double xp;
+	double g;
 };
 
 class KDane
 {
 private:
+	double mfSkala;
 	bool mbWarunkiIanalityczne;
 	bool mbWarunkiIpeynIrons;
 	std::vector<strukt_warunekI> warunkiI;
@@ -49,6 +50,12 @@ public:
 	KDane();
 	~KDane();
 
+	void UstawSkale(double iSkala);
+
+	void ZastosujSkale();
+	void OdstosujSkale();
+
+	inline double PobierzSkale() { return mfSkala; };
 	void FinalizujWczytywanie();
 	void DodajWezlyWarI();
 	void DodajWezlyWarII();

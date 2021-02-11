@@ -13,6 +13,7 @@
 #include "RAMESDoc.h"
 #include "RAMESView.h"
 #include "DlgObliczeniaUstawienia.h"
+#include "DlgWynikiUstawienia.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -35,6 +36,8 @@ BEGIN_MESSAGE_MAP(CRAMESView, CView)
 	ON_UPDATE_COMMAND_UI(ID_WYNIKI_ZAPISZJAKO, &CRAMESView::OnUpdateWynikiZapiszjako)
 	ON_COMMAND(ID_OBLICZENIA_USTAWIENIA, &CRAMESView::OnObliczeniaUstawienia)
 	ON_UPDATE_COMMAND_UI(ID_OBLICZENIA_USTAWIENIA, &CRAMESView::OnUpdateObliczeniaUstawienia)
+	ON_UPDATE_COMMAND_UI(ID_WYNIKI_USTAWIENIA, &CRAMESView::OnUpdateWynikiUstawienia)
+	ON_COMMAND(ID_WYNIKI_USTAWIENIA, &CRAMESView::OnWynikiUstawienia)
 END_MESSAGE_MAP()
 
 // CRAMESView construction/destruction
@@ -195,4 +198,31 @@ void CRAMESView::OnUpdateObliczeniaUstawienia(CCmdUI* pCmdUI)
 	ASSERT_VALID(pDoc);
 
 	pCmdUI->Enable(pDoc->dane->mDaneFlag);
+}
+
+
+void CRAMESView::OnUpdateWynikiUstawienia(CCmdUI* pCmdUI)
+{
+	CRAMESDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+
+	pCmdUI->Enable(pDoc->obliczenia->mObliczeniaFlag);
+}
+
+void CRAMESView::OnWynikiUstawienia()
+{
+	CRAMESDoc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+
+	DlgWynikiUstawienia dlgWynikiUstawienia;
+
+	int result = dlgWynikiUstawienia.DoModal();
+
+	if (result == IDOK)
+	{
+		pDoc->obliczenia->UstawWynikiTylkoWezly(dlgWynikiUstawienia.mRadioWyniki);
+		pDoc->obliczenia->UstawWynikiGestoscAproksymacji(dlgWynikiUstawienia.mEditGestoscAproksymacji);
+
+		Invalidate();
+	}
 }

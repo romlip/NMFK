@@ -97,8 +97,8 @@ KWektorK* KUkladRownan::RozwiazNadrelaksacja()
 		return nullptr;
 	}
 
-	float Xmin = -5;
-	float XmaX = 5;
+	double Xmin = -5;
+	double XmaX = 5;
 	int nn = A->DajN();
 	int mm = A->DajM();
 
@@ -107,8 +107,8 @@ KWektorK* KUkladRownan::RozwiazNadrelaksacja()
 		x0(i + 1) = Xmin + (XmaX - Xmin) / nn * i;
 
 	// omega i blad graniczny
-	float w = 1.75;
-	//float err = 1e-8;
+	double w = 1.75;
+	//double err = 1e-8;
 
 /*
 	# A = L + D + U
@@ -153,10 +153,10 @@ KWektorK* KUkladRownan::RozwiazCholesky()
 		throw runtime_error("macierz nie jest dodatnio okreslona");
 
 	unsigned m = A->DajM();
-	KMacierz L(m, m);
+	//KMacierz L(m, m);
 
 	// rozklad choleskyego-banachiewicza
-	float suma;
+	double suma;
 	for (unsigned i(1); i <= m; ++i)
 	{
 		for (unsigned j(1); j <= i; ++j)
@@ -165,27 +165,27 @@ KWektorK* KUkladRownan::RozwiazCholesky()
 			if (i == j)
 			{
 				for (unsigned k(1); k <= i - 1; ++k)
-					suma += L(i, k) * L(i, k);
-				L(i, i) = sqrt((*A)(i, i) - suma);
+					suma += (*A)(i, k) * (*A)(i, k);
+				(*A)(i, i) = sqrt((*A)(i, i) - suma);
 			}
-			else // j < 1
+			else // j < i
 			{
 				for (unsigned k(1); k <= j - 1; ++k)
-					suma += L(i, k) * L(j, k);
-				L(i, j) = 1 / L(j, j) * ((*A)(i, j) - suma);
+					suma += (*A)(i, k) * (*A)(j, k);
+				(*A)(i, j) = 1 / (*A)(j, j) * ((*A)(i, j) - suma);
 			}
 		}
 	}
-
-	KMacierz LT(L.T()); // LT = L^T
+	//KMacierz LT((*A).T()); // LT = L^T
 
 	// Rozwiazujemy uklad L * Y = B
 	KWektorK Y(m);
-	KUkladRownan Ly_b(&L, &Y, B);
+	KUkladRownan Ly_b(A, &Y, B);
 	Ly_b.RozwiazEliminacja(0);
 
-	// Rozwiazujemy LT * X = Y ; Y = X z poprzedniego ukladu
-	KUkladRownan LTx_y(&LT, X, &Y);
+	(*A) = ((*A).T()); // LT = gorna trojkatna A
+	// Rozwiazujemy LT * X = Y ;
+	KUkladRownan LTx_y(A, X, &Y);
 	LTx_y.RozwiazEliminacja(1);
 
 	return X;
@@ -193,7 +193,7 @@ KWektorK* KUkladRownan::RozwiazCholesky()
 
 KWektorK* KUkladRownan::RozwiazEliminacja(int gorna_dolna)
 {
-	float suma;
+	double suma;
 	if (gorna_dolna == 0)
 	{
 		for (unsigned i(1); i <= A->DajM(); ++i)

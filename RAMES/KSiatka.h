@@ -8,8 +8,8 @@
 #include "KElement1D.h"
 
 struct strukt_zrodlo_punktowe {
-	float x;
-	float g;
+	double x;
+	double g;
 	KWezel1D* pz;
 };
 
@@ -17,10 +17,10 @@ class KSiatka
 {
 private:
 	int liczba_wezlow_w_elemencie; //liczba wezlow w elemencie
-	float mfWspolczynnikZageszczania;
+	double mfWspolczynnikZageszczania;
 	bool mbZagescWstepnie;
 	unsigned muKrotnoscZageszczenia;
-	float mfXmin, mfXmax;
+	double mfXmin, mfXmax;
 
 	std::vector<strukt_zrodlo_punktowe> mvPunktyZrodlowe;
 
@@ -38,23 +38,23 @@ public:
 	~KSiatka();
 
 	void UstawLiczbeWezlowWelemencie(int iliczba_wezlow);
-	void UstawXmin(float iXmin);
-	void UstawXmax(float iXmax);
+	void UstawXmin(double iXmin);
+	void UstawXmax(double iXmax);
 	void UstawZageszczanieWstepne(bool czy);
 	void UstawKrotnoscZageszczenia(unsigned krotnosc);
-	float PobierzXmin();
-	float PobierzXmax();
+	double PobierzXmin();
+	double PobierzXmax();
 
 	void NumerujWezly();
 
-	KWezel1D* WezelIstnieje(float x_wezla);
+	KWezel1D* WezelIstnieje(double x_wezla);
 	KElement1D* ZnajdzElementZpunktem(KWezel1D* punkt_zrodlowy);
 
-	KWezel1D* DodajWezel(float x);
-	void DodajElement(unsigned inr, float ixl, float ixp, float ik, float iif);
+	KWezel1D* DodajWezel(double x);
+	void DodajElement(unsigned inr, double ixl, double ixp, double ik, double iif);
 	void DodajZrodloPunktowe(strukt_zrodlo_punktowe& zrodlo);
 	void DodajPunktyZrodlowe();
-	//void WstawElement(unsigned inr, float ixl, float ixp, float k);
+	//void WstawElement(unsigned inr, double ixl, double ixp, double k);
 	void WstawElementZa(KWezel1D* iwezel);
 	void DodajWezlyWewnetrzne();
 	void Finalizuj();

@@ -50,7 +50,7 @@ END_MESSAGE_MAP()
 
 void DlgObliczeniaUstawienia::OnCbnSelchangeCombo1()
 {
-	mComboBoxWarunkiSelection= mComboBoxCtrl.GetCurSel();
+	//mComboBoxWarunkiSelection= mComboBoxCtrl.GetCurSel();
 }
 
 
@@ -58,7 +58,7 @@ void DlgObliczeniaUstawienia::OnCbnSelchangeComboMetodaRozwiazaniaUr()
 {
 	if (mComboBoxRozwiazanieUr.GetCurSel() == 1)
 		mComboBoxRozwiazanieUr.SetCurSel(0);
-	mComboRozwiazanieUrSelection = mComboBoxRozwiazanieUr.GetCurSel();
+	//mComboRozwiazanieUrSelection = mComboBoxRozwiazanieUr.GetCurSel();
 }
 
 

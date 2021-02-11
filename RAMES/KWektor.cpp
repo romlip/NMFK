@@ -6,12 +6,12 @@
 /////////////////////////////////////////////
 // KWektor
 
-float KWektor::DajI(int i)
+double KWektor::DajI(int i)
 {
     return M[i - 1];
 }
 
-KWektor& KWektor::operator=(float* tablica1D)
+KWektor& KWektor::operator=(double* tablica1D)
 {
     for (unsigned i = 0; i < m * n; i++)
     {
@@ -20,7 +20,7 @@ KWektor& KWektor::operator=(float* tablica1D)
     return *this;
 }
 
-float& KWektor::operator()(unsigned i)
+double& KWektor::operator()(unsigned i)
 {
     if (i > m * n || i < 1)
     {
@@ -32,7 +32,7 @@ float& KWektor::operator()(unsigned i)
 /////////////////////////////////////////////
 // KWektorW
 
-KWektorW::KWektorW(unsigned in, const float* tablica): KWektor(m, in)
+KWektorW::KWektorW(unsigned in, const double* tablica): KWektor(m, in)
 {
     for (unsigned i(0); i < in; ++i)
     {
@@ -43,7 +43,7 @@ KWektorW::KWektorW(unsigned in, const float* tablica): KWektor(m, in)
 /////////////////////////////////////////////
 // KWektorK
 
-KWektorK::KWektorK(unsigned im, const float* tablica) : KWektor(im, n)
+KWektorK::KWektorK(unsigned im, const double* tablica) : KWektor(im, n)
 {
     for (unsigned i(0); i < im; ++i)
     {

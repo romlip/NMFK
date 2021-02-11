@@ -4,19 +4,20 @@ class KWezel1D
 {
 private:
 	unsigned numer;
-	float x; //wspolrzedna x wezla
-	float temperatura; //K
+	double x; //wspolrzedna x wezla
+	double temperatura; //K
 
 public:
 	KWezel1D();
-	KWezel1D(unsigned inumer, float ix);
+	KWezel1D(unsigned inumer, double ix);
 
+	void UstawX(double ix);
 	void UstawNumer(unsigned inumer);
-	void UstawTemperature(float);
+	void UstawTemperature(double);
 
 	unsigned PobierzNumer();
-	float PobierzX();
-	float PobierzTemperature();
+	double PobierzX();
+	double PobierzTemperature();
 };
 
 

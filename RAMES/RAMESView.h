@@ -49,6 +49,8 @@ public:
 	afx_msg void OnUpdateWynikiZapiszjako(CCmdUI* pCmdUI);
 	afx_msg void OnObliczeniaUstawienia();
 	afx_msg void OnUpdateObliczeniaUstawienia(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateWynikiUstawienia(CCmdUI* pCmdUI);
+	afx_msg void OnWynikiUstawienia();
 };
 
 #ifndef _DEBUG  // debug version in RAMESView.cpp

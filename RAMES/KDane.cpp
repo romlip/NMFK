@@ -14,6 +14,27 @@ KDane::~KDane()
 	if (siatka) delete siatka;
 }
 
+void KDane::UstawSkale(double iSkala)
+{
+	mfSkala = iSkala;
+}
+
+void KDane::ZastosujSkale()
+{
+	for (auto it_w = siatka->PobierzWezly()->begin(); it_w != siatka->PobierzWezly()->begin(); ++it_w)
+	{
+		(*it_w)->UstawX((*it_w)->PobierzX() * mfSkala);
+	}
+}
+
+void KDane::OdstosujSkale()
+{
+	for (auto it_w = siatka->PobierzWezly()->begin(); it_w != siatka->PobierzWezly()->begin(); ++it_w)
+	{
+		(*it_w)->UstawX((*it_w)->PobierzX() / mfSkala);
+	}
+}
+
 //////////////////////////////
 // Dodaje wskazniki wezlow warunku I w wektorze warunkiI
 
@@ -156,6 +177,7 @@ vector<strukt_warunek_konwekcyjny>* KDane::PobierzWarunkiKonwekcyjne()
  void KDane::FinalizujWczytywanie()
  {
 	 siatka->Finalizuj();
+	 //ZastosujSkale();
 	 DodajWezlyWarI(); // dodaj wskazniki wezlow warunku I w wektorze warunkiI
 	 DodajWezlyWarII();
 	 DodajWezlyWarKon(); // dodaj wskazniki wezlow warunk konwekcyjnego w wektorze warunki_konwekcyjne

@@ -7,16 +7,20 @@ KWezel1D::KWezel1D() {
 	x = -1;
 	temperatura = -1;
 }
-KWezel1D::KWezel1D(unsigned inumer, float ix) {
+KWezel1D::KWezel1D(unsigned inumer, double ix) {
 	numer = inumer;
 	x = ix;
 	temperatura = -1;
+}
+void KWezel1D::UstawX(double ix)
+{
+	x = ix;
 }
 void KWezel1D::UstawNumer(unsigned inumer)
 {
 	numer = inumer;
 }
-void KWezel1D::UstawTemperature(float itemp) {
+void KWezel1D::UstawTemperature(double itemp) {
 	temperatura = itemp;
 }
 
@@ -24,9 +28,9 @@ unsigned KWezel1D::PobierzNumer()
 {
 	return numer;
 }
-float KWezel1D::PobierzTemperature() {
+double KWezel1D::PobierzTemperature() {
 	return temperatura;
 }
-float KWezel1D::PobierzX() {
+double KWezel1D::PobierzX() {
 	return x;
 }

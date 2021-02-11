@@ -31,7 +31,7 @@ public:
 	void CzytajStrukture(std::ifstream& plik, KDane* dane);
 	void CzytajLiczbeWezlow(std::ifstream& plik, KDane* dane, std::string& line);
 	void CzytajNazwe(std::ifstream& plik, KDane* dane, std::string& line);
-
+	void CzytajSkale(std::ifstream& pliczek, KDane* dane, std::string& line);
 	void ZapiszWynik(KDane* dane, KObliczenia* obliczenia, const char* inazwaPliku = "");
 };
 

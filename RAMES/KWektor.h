@@ -12,10 +12,10 @@ public:
     KWektor(unsigned im, unsigned in) : KMacierz(im, in) {};
     ~KWektor() {};
 
-    virtual KWektor& operator=(float* const tablica1D);
-    virtual float& operator()(unsigned i);
+    virtual KWektor& operator=(double* const tablica1D);
+    virtual double& operator()(unsigned i);
 
-    float DajI(int i);
+    double DajI(int i);
 };
 
 class KWektorW :
@@ -27,7 +27,7 @@ protected:
 public:
     KWektorW() : KWektor() {};
     KWektorW(unsigned in) : KWektor(m, in) {};
-    KWektorW(unsigned in, const float* tablica);
+    KWektorW(unsigned in, const double* tablica);
     ~KWektorW() {};
 };
 
@@ -40,7 +40,7 @@ protected:
 public:
     //KWektorK() : KWektor() {};
     KWektorK(unsigned im) : KWektor(im, n) {};
-    KWektorK(unsigned im, const float* tablica);
+    KWektorK(unsigned im, const double* tablica);
     KWektorK(KMacierz &iM);
 
     ~KWektorK() {};

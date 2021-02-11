@@ -11,7 +11,17 @@
 
 using namespace std;
 
-KWezel1D* KSiatka::WezelIstnieje(float x_wezla)
+
+KSiatka::KSiatka() {
+    liczba_wezlow_w_elemencie = 2;
+    mfWspolczynnikZageszczania = 3;
+    mbZagescWstepnie = false;
+    muKrotnoscZageszczenia = 0;
+    mfXmax = 0;
+    mfXmin = 0;
+}
+
+KWezel1D* KSiatka::WezelIstnieje(double x_wezla)
 {
     for (auto it_w = vpWezly.begin(); it_w != vpWezly.end(); ++it_w)
     {
@@ -27,7 +37,7 @@ KElement1D* KSiatka::ZnajdzElementZpunktem(KWezel1D* punkt_zrodlowy)
 {
     for (auto it_e = vElementy.begin(); it_e != vElementy.end(); ++it_e)
     {
-        float xpz = punkt_zrodlowy->PobierzX();
+        double xpz = punkt_zrodlowy->PobierzX();
         if (it_e->PobierzWezel(1)->PobierzX() < xpz && it_e->PobierzWezel(2)->PobierzX() > xpz)
             return &*it_e;
     }
@@ -39,7 +49,7 @@ void KSiatka::WstawElementZa(KWezel1D* iwezel)
     // znajdz element, w ktorym znajduje sie wezel
     for (auto it_e = vElementy.begin(); it_e != vElementy.end(); ++it_e)
     {
-        float x_iwezla = iwezel->PobierzX();
+        double x_iwezla = iwezel->PobierzX();
         if (it_e->PobierzWezel(1)->PobierzX() < x_iwezla && it_e->PobierzWezel(2)->PobierzX() > x_iwezla)
         {
             KWezel1D* e_prawy = it_e->PobierzWezel(2);
@@ -58,7 +68,7 @@ void KSiatka::DodajWezlyWewnetrzne()
 {
     if (liczba_wezlow_w_elemencie > 2)
     {
-        float xl, h;
+        double xl, h;
         KWezel1D* pNowyWezel;
         for (auto it_e = vElementy.begin(); it_e != vElementy.end(); ++it_e)
         {
@@ -78,8 +88,8 @@ void KSiatka::ZagescWstepnie()
 {
     if (mbZagescWstepnie)
     {
-        bool bWstawiono = false;
-        while (!bWstawiono)
+        bool bWstawiono;
+        do
         {
             bWstawiono = false;
             for (auto it_e = vElementy.begin(); (it_e + 1) != vElementy.end(); ++it_e)
@@ -99,7 +109,7 @@ void KSiatka::ZagescWstepnie()
                 if (bWstawiono)
                     break;
             }
-        }
+        } while (bWstawiono);
     }
 }
 
@@ -126,20 +136,11 @@ void KSiatka::Zagesc()
     }
 }
 
-KWezel1D* KSiatka::DodajWezel(float x)
+KWezel1D* KSiatka::DodajWezel(double x)
 {
     KWezel1D* w = new KWezel1D((unsigned)vpWezly.size() + 1, x);
     vpWezly.push_back(w);
     return w;
-}
-
-KSiatka::KSiatka() {
-    liczba_wezlow_w_elemencie = 2;
-    mfWspolczynnikZageszczania = 3;
-    mbZagescWstepnie = false;
-    muKrotnoscZageszczenia = 0;
-    mfXmax = 0;
-    mfXmin = 0;
 }
 
 //KSiatka::KSiatka(char*  nazwa_pliku) {
@@ -150,7 +151,7 @@ KSiatka::KSiatka() {
 ///////////////////////////////////////////////
 // Dodaje element na koncu wektora elementow
 
-void KSiatka::DodajElement(unsigned inr, float ixl, float ixp, float ik, float iif)
+void KSiatka::DodajElement(unsigned inr, double ixl, double ixp, double ik, double iif)
 {
     KWezel1D *pxl = nullptr, *pxp = nullptr;
 
@@ -181,7 +182,7 @@ void KSiatka::DodajPunktyZrodlowe()
     // stworz wektor wskaznikow na wezly bedace zrodlami punktowymi; sluzy do wypelnienia globalnego wektora naprezen
     for (auto it_zp = mvPunktyZrodlowe.begin(); it_zp != mvPunktyZrodlowe.end(); ++it_zp)
     {
-        float x_zrodla = it_zp->x;
+        double x_zrodla = it_zp->x;
         KWezel1D* punkt_zrodlowy = WezelIstnieje(x_zrodla);
         if (punkt_zrodlowy == nullptr)
         {
@@ -196,8 +197,8 @@ void KSiatka::Generuj()
 {
     vpWezly = vpWezly_wczytane;
     vElementy = vStruktura;
-
     DodajPunktyZrodlowe();
+
     ZagescWstepnie();
     Zagesc();
     DodajWezlyWewnetrzne();// dodaje wezly wewnatrz elementu
@@ -251,7 +252,7 @@ KSiatka::~KSiatka() {
     {
         for (auto it_wezly = vpWezly.begin(); it_wezly != vpWezly.end(); ++it_wezly)
         {
-            delete* (it_wezly);
+            delete *(it_wezly);
         }
     }
 }
@@ -260,19 +261,17 @@ KSiatka::~KSiatka() {
 // Do wczytanej z pliku struktury dodaje punkty zrodlowe
 // i konieczne elementy
 
-
-
 void KSiatka::UstawLiczbeWezlowWelemencie(int iliczba_wezlow)
 {
     liczba_wezlow_w_elemencie = iliczba_wezlow;
 }
 
-void KSiatka::UstawXmin(float iXmin)
+void KSiatka::UstawXmin(double iXmin)
 {
     mfXmin = iXmin;
 }
 
-void KSiatka::UstawXmax(float iXmax)
+void KSiatka::UstawXmax(double iXmax)
 {
     mfXmax = iXmax;
 }
@@ -287,12 +286,12 @@ void KSiatka::UstawKrotnoscZageszczenia(unsigned krotnosc)
     muKrotnoscZageszczenia = krotnosc;
 }
 
-float KSiatka::PobierzXmin()
+double KSiatka::PobierzXmin()
 {
     return mfXmin;
 }
 
-float KSiatka::PobierzXmax()
+double KSiatka::PobierzXmax()
 {
     return mfXmax;
 }
