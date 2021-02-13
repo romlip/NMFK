@@ -8,14 +8,15 @@ class KWektor :
 protected:
 
 public:
-    KWektor() {};
+    KWektor() : KMacierz() {};
     KWektor(unsigned im, unsigned in) : KMacierz(im, in) {};
     ~KWektor() {};
 
     virtual KWektor& operator=(double* const tablica1D);
     virtual double& operator()(unsigned i);
+    virtual double operator()(unsigned i) const;
 
-    double DajI(int i);
+    double DajI(int i) const;
 };
 
 class KWektorW :
@@ -26,7 +27,7 @@ protected:
 
 public:
     KWektorW() : KWektor() {};
-    KWektorW(unsigned in) : KWektor(m, in) {};
+    KWektorW(unsigned in) : KWektor(1, in) {};
     KWektorW(unsigned in, const double* tablica);
     ~KWektorW() {};
 };
@@ -38,11 +39,10 @@ protected:
     static const unsigned n = 1; // 1 kolumna
 
 public:
-    //KWektorK() : KWektor() {};
-    KWektorK(unsigned im) : KWektor(im, n) {};
+    KWektorK() : KWektor() {};
+    KWektorK(unsigned im) : KWektor(im, 1) {};
     KWektorK(unsigned im, const double* tablica);
     KWektorK(KMacierz &iM);
-
     ~KWektorK() {};
 };
 

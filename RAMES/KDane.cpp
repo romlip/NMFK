@@ -70,7 +70,10 @@ void KDane::DodajWezlyWarII()
 
 void KDane::ClearDane()
 {
-	if (siatka) delete siatka;
+	if (siatka) {
+		delete siatka;
+		siatka = new KSiatka();
+	}
 	warunkiI.clear();
 	warunkiII.clear();
 	warunki_konwekcyjne.clear();
@@ -182,4 +185,5 @@ vector<strukt_warunek_konwekcyjny>* KDane::PobierzWarunkiKonwekcyjne()
 	 DodajWezlyWarII();
 	 DodajWezlyWarKon(); // dodaj wskazniki wezlow warunk konwekcyjnego w wektorze warunki_konwekcyjne
 	 SprawdzPoprawnoscDanych();
+	 mDaneFlag = true;
  }

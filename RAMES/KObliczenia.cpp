@@ -4,6 +4,8 @@
 #include <algorithm>
 
 #include "KObliczenia.h"
+#include "KMacierzSPF.h"
+
 #include "mes.h"
 
 using namespace std;
@@ -11,7 +13,8 @@ using namespace std;
 KObliczenia::KObliczenia()
 {
 	mWyniki = 0;
-	eWarunkiI = PAYNE_IRONS;
+	mGestoscAproksymacji = 1;
+	eWarunkiI = EwarunkiI::PAYNE_IRONS;
 	mObliczeniaFlag = false;
 	dane = new KDane();
 	urMES = nullptr;
@@ -98,9 +101,9 @@ void KObliczenia::WypelnijK(KElement1D *e)
 
 	for (int i(1); i <= e->PobierzWezly()->size(); ++i)
 	{
-		for (auto it_warI : *dane->PobierzWarunkiI())
+		for (auto it_warI = dane->PobierzWarunkiI()->begin(); it_warI != dane->PobierzWarunkiI()->end(); ++it_warI)
 		{
-			if (e->PobierzWezel(i)->PobierzX() == it_warI.x) // jesli i-ty wezel jest warunkiem brzegowym
+			if (e->PobierzWezel(i)->PobierzX() == it_warI->x) // jesli i-ty wezel jest warunkiem brzegowym
 				wezly_war_I.push_back(i);
 		}
 	}
@@ -132,9 +135,9 @@ void KObliczenia::WypelnijP(KElement1D* e)
 
 	for (int i(1); i <= e->PobierzWezly()->size(); ++i)
 	{
-		for (auto it_warI : *dane->PobierzWarunkiI())
+		for (auto it_warI = dane->PobierzWarunkiI()->begin(); it_warI != dane->PobierzWarunkiI()->end(); ++it_warI)
 		{
-			if (e->PobierzWezel(i)->PobierzX() == it_warI.x) // jesli i-ty wezel jest warunkiem brzegowym
+			if (e->PobierzWezel(i)->PobierzX() == it_warI->x) // jesli i-ty wezel jest warunkiem brzegowym
 				wezly_war_I.push_back(i);
 		}
 	}
@@ -153,10 +156,10 @@ void KObliczenia::WypelnijUkladRownan(KElement1D* e)
 {
 	switch (eWarunkiI)
 	{
-	case REDUKCJA:
+	case EwarunkiI::REDUKCJA:
 		WypelnijUkladRownanRedukcja(e);
 		break;
-	case PAYNE_IRONS:
+	case EwarunkiI::PAYNE_IRONS:
 		WypelnijUkladRownanPayneIrons(e);
 		break;
 	default:
@@ -181,7 +184,7 @@ void KObliczenia::WypelnijUkladRownanRedukcja(KElement1D* e)
 	// okresl ktore wezly w elemencie sa warunkami brzegowymi I rodzaju; sluzy do redukcji ilosci rownan
 	vector<unsigned> wezly_war_I; //wektor numerow wezlow elementu bedacych warunkami I rodzaju
 	vector<int> il_wezlow_war_I_przed;
-	for (int i(1); i <= e->PobierzWezly()->size(); ++i) // iteruj po wezlach elementu e
+	for (unsigned i(1); i <= e->PobierzWezly()->size(); ++i) // iteruj po wezlach elementu e
 	{
 		il_wezlow_war_I_przed.push_back(0);
 		for (auto it_warI : *dane->PobierzWarunkiI()) // iteruj po globalnych warunkach I
@@ -242,9 +245,9 @@ void KObliczenia::WypelnijUkladRownanPayneIrons(KElement1D* e)
 	vector<unsigned> wezly_war_I; //wektor numerow wezlow elementu bedacych warunkami I rodzaju
 	for (int i(1); i <= e->PobierzWezly()->size(); ++i) // iteruj po wezlach elementu e
 	{
-		for (auto it_warI : *dane->PobierzWarunkiI()) // iteruj po globalnych warunkach I
+		for (auto it_warI = dane->PobierzWarunkiI()->begin(); it_warI != dane->PobierzWarunkiI()->end(); ++it_warI) // iteruj po globalnych warunkach I
 		{
-			if (e->PobierzWezel(i) == it_warI.pw) // jesli i-ty wezel elementu jest warunkiem brzegowym
+			if (e->PobierzWezel(i) == it_warI->pw) // jesli i-ty wezel elementu jest warunkiem brzegowym
 				wezly_war_I.push_back(i);
 		}
 	}
@@ -253,7 +256,7 @@ void KObliczenia::WypelnijUkladRownanPayneIrons(KElement1D* e)
 	// bedacymi warunkami I rodzaju
 	for (unsigned i = 1; i <= k_e->DajM(); i++) // iteruj po wierszach lokalnej macierzy sztywnosci k
 	{
-		for (unsigned j = 1; j <= k_e->DajN(); j++) // iteruj po kolumnach lokalnej macierzy sztywnosci k
+		for (unsigned j = i; j <= k_e->DajN(); j++) // iteruj po kolumnach lokalnej macierzy sztywnosci k
 		{
 			mnoznik = 1.0;
 			for (auto it_wwI : wezly_war_I)
@@ -261,7 +264,7 @@ void KObliczenia::WypelnijUkladRownanPayneIrons(KElement1D* e)
 				if (it_wwI == i && it_wwI == j)
 					mnoznik = stalaMnoznika;
 			}
-			(*urMES->PobierzA())(e->PobierzWezel(i)->PobierzNumer(), e->PobierzWezel(j)->PobierzNumer()) += k_e->DajIJ(i, j) * mnoznik;
+			(*urMES->PobierzA())(e->PobierzWezel(i)->PobierzNumer(), e->PobierzWezel(j)->PobierzNumer()) += (*k_e)(i, j) * mnoznik;
 		}
 	}
 
@@ -279,7 +282,6 @@ void KObliczenia::WypelnijUkladRownanPayneIrons(KElement1D* e)
 		}
 		(*urMES->PobierzB())(globalny_nr) += p_e->DajI(i);
 	}
-
 	delete k_e;
 	delete p_e;
 }
@@ -295,19 +297,19 @@ KWektorK* KObliczenia::Licz(KDane* idane)
 	unsigned rozmiar = (unsigned)dane->PobierzSiatke()->vpWezly.size();
 
 	// tworzenie i wypelnianie ukladu rownan
-	if (eWarunkiI == REDUKCJA)
+	if (eWarunkiI == EwarunkiI::REDUKCJA)
 		rozmiar -= il_warunkow_I;
 
-	KMacierz K(rozmiar); // globalna macierz sztywnosci
+	KMacierzSPF K(rozmiar, dane->PobierzSiatke()->PobierzLiczbeWezlowWelemencie() * 2 - 1); // globalna macierz sztywrz(nosci
 	KWektorK P(rozmiar); // globalny wektor naprezen
 	KWektorK X(rozmiar);
 
+	if (urMES) delete urMES;
 	urMES = new KUkladRownan(&K, &X, &P);
 
 	// iteruj po wszystkich elementach i uzupelnij globalna macierz sztywnosci macierzami lokalnymi
 	for (auto it_e =  dane->PobierzSiatke()->PobierzElementy()->begin(); it_e != dane->PobierzSiatke()->PobierzElementy()->end(); ++it_e)
 	{
-
 		//KMacierz k(wymiar);
 		//for (unsigned i = 1; i <= wymiar; i++)
 		//{
@@ -324,6 +326,7 @@ KWektorK* KObliczenia::Licz(KDane* idane)
 		//}
 		WypelnijUkladRownan(&*it_e);
 	}
+
 
 	// uwzglednij warunki brzegowe i zrodla punktowe w wektorze naprezen
 	WypelnijZrodlamiPunktowymi(urMES);
@@ -416,7 +419,7 @@ void KObliczenia::WypelnijWarunkamiIIRodzaju(KUkladRownan* ur)
 
 	for (auto it_wII : *dane->PobierzWarunkiII())
 	{
-		if (eWarunkiI == REDUKCJA)
+		if (eWarunkiI == EwarunkiI::REDUKCJA)
 		{
 			il_wezlow_z_war_I = 0;
 			// sprawdz ile wezlow z warunkami I rodzaju  znajduje sie przed wezlem z warunkiem konwekcyjnym
@@ -439,7 +442,7 @@ void KObliczenia::WypelnijWarunkamiKonwekcyjnymi(KUkladRownan* ur)
 
 	for (auto it_wk : *dane->PobierzWarunkiKonwekcyjne())
 	{
-		if (eWarunkiI == REDUKCJA)
+		if (eWarunkiI == EwarunkiI::REDUKCJA)
 		{
 			il_wezlow_z_war_I = 0;
 			// sprawdz ile wezlow z warunkami I rodzaju  znajduje sie przed wezlem z warunkiem konwekcyjnym
@@ -465,13 +468,13 @@ void KObliczenia::WypelnijZrodlamiPunktowymi(KUkladRownan* ur)
 	for (auto it_zp : *dane->PobierzSiatke()->PobierzZrodlaPunktowe())
 	{
 		il_wezlow_z_war_I = 0;
-		if (eWarunkiI == REDUKCJA)
+		if (eWarunkiI == EwarunkiI::REDUKCJA)
 		{
-			for (auto it_wI : *dane->PobierzWarunkiI())
+			for (auto it_wI = dane->PobierzWarunkiI()->begin(); it_wI != dane->PobierzWarunkiI()->end(); ++it_wI)
 			{
-				for (auto it_warI : *dane->PobierzWarunkiI())
+				for (auto it_warI = dane->PobierzWarunkiI()->begin(); it_warI != dane->PobierzWarunkiI()->end(); ++it_warI)
 				{
-					if (it_wI.x == it_warI.x) // jesli i-ty wezel jest warunkiem brzegowym
+					if (it_wI->x == it_warI->x) // jesli i-ty wezel jest warunkiem brzegowym
 						il_wezlow_z_war_I++;
 				}
 			}
@@ -492,7 +495,7 @@ void KObliczenia::UstawTemperatureWezlow()
 	{
 		if (it_w->PobierzTemperature() > 0)
 		{
-			if (eWarunkiI != REDUKCJA)
+			if (eWarunkiI != EwarunkiI::REDUKCJA)
 				++i;
 			continue;
 		}

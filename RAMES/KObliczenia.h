@@ -12,10 +12,11 @@
 #define TYLKO_WEZLY FALSE
 #define GESTOSC_APROKSYMACJI 6
 
-enum EwarunkiI { REDUKCJA = 0, ANALITYCZNE2 = 1, PAYNE_IRONS = 2 };
+enum class EwarunkiI { REDUKCJA = 0, ANALITYCZNE2 = 1, PAYNE_IRONS = 2 };
 
 class KObliczenia
 {
+
 private:
 	int mWyniki;
 	int mGestoscAproksymacji;

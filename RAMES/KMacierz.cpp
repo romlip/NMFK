@@ -13,17 +13,17 @@ KMacierz::KMacierz()
 {
     m = 0;
     n = 0;
+    mRozmiar = 0;
     M = nullptr;
 }
 
 KMacierz::KMacierz(const KMacierz & copy)
 {
-        m = copy.m;
-        n = copy.n;
-        M = new double[static_cast<unsigned long long>(m) * n];
-        for (unsigned i(0); i < m; ++i)
-            for (unsigned j(0); j < n; ++j)
-                M[i * n + j] = copy.M[i * n + j];
+    m = copy.m;
+    n = copy.n;
+    Stworz();
+    for (unsigned i(0); i < mRozmiar; ++i)
+                M[i] = copy.M[i];
 }
 
 /////////////////////////////////////////////
@@ -36,33 +36,21 @@ KMacierz::KMacierz(int in): KMacierz(in, in)
 /////////////////////////////////////////////
 // Tworzy macierz im x in i wypelnia ja zerami
 
-KMacierz::KMacierz(int im, int in)
+KMacierz::KMacierz(int im, int in): m(im), n(in)
 {
-    m = im;
-    n = in;
     Stworz();
 }
 
 KMacierz::KMacierz(unsigned rozmiar, const double* tablica) : KMacierz(rozmiar, rozmiar)
 {
-    for (unsigned i(0); i < rozmiar; ++i)
-    {
-        for (unsigned j(0); j < rozmiar; ++j)
-        {
-            M[i * n + j] = *(tablica + static_cast<unsigned long long>(i) * n + j);
-        }
-    }
+    for (unsigned i(0); i < rozmiar * rozmiar; ++i)
+            M[i] = *(tablica + static_cast<unsigned long long>(i));
 }
 
 KMacierz::KMacierz(unsigned im, unsigned in, const double* tablica): KMacierz(im, in)
 {
-    for (unsigned i(0); i < m; ++i)
-    {
-        for (unsigned j(0); j < n; ++j)
-        {
-            M[i * n + j] = *(tablica + static_cast<unsigned long long>(i) * n + j);
-        }
-    }
+    for (unsigned i(0); i < m * n; ++i)
+            M[i] = *(tablica + static_cast<unsigned long long>(i));
 }
 
 ////////////////////////////////////////////
@@ -75,19 +63,28 @@ KMacierz::~KMacierz()
 
 void KMacierz::Stworz()
 {
-    M = new double[static_cast<unsigned long long>(m) * n]{ 0 };
+    mRozmiar = m * n;
+    M = new double[mRozmiar]{ 0 };
 }
 
 ////////////////////////////////////////////////////////////
 // Zwraca element (i, j) macierzy. Indeksy zaczynaja sie od 1,
-// nie od 0!
+// nie od 0! Z metody powinno korzystaja wszystkie pozostale funkcje
+// i powinna byc nadpisywana w klasie pochodnej
 
 double& KMacierz::operator()(unsigned i, unsigned j)
 {
     if (i > m || j > n || i < 1 || j < 1)
-    {
         throw runtime_error("Indeks poza zakresem");
-    }
+
+    return this->M[(i - 1) * n + (j - 1)];
+}
+
+double KMacierz::operator()(unsigned i, unsigned j) const
+{
+    if (i > m || j > n || i < 1 || j < 1)
+        throw runtime_error("Indeks poza zakresem");
+
     return this->M[(i - 1) * n + (j - 1)];
 }
 
@@ -97,15 +94,11 @@ double& KMacierz::operator()(unsigned i, unsigned j)
 KMacierz& KMacierz::operator=( double** const tablica2D)
 {
     for (unsigned i = 0; i < m; i++)
-    {
         for (unsigned j = 0; j < n; j++)
-        {
             this->M[i * n + j] = tablica2D[i][j];
-        }
-    }
+
     return *this;
 }
-
 
 KMacierz& KMacierz::operator=(const KMacierz& iM)
 {
@@ -115,12 +108,12 @@ KMacierz& KMacierz::operator=(const KMacierz& iM)
 
     m = iM.m;
     n = iM.n;
-    M = new double[static_cast<unsigned long long>(m) * n]{ 0 };
+    Stworz();
 
-    for (unsigned i{ 0 }; i < m; ++i) {
-        for (unsigned j{ 0 }; j < n; ++j)
-            M[i * n + j] = iM.M[i * n + j];
-    }
+    for (unsigned i{ 1 }; i <= m; ++i)
+        for (unsigned j{ 1 }; j <= n; ++j)
+            (*this)(i, j) = iM(i, j);
+ 
     return *this;
 }
 
@@ -128,54 +121,54 @@ KMacierz& KMacierz::operator=(const KMacierz& iM)
 ///////////////////////////////////////////////////////////
 // Mnozenie macierzy przez macierz
 
-KMacierz KMacierz::operator*(const KMacierz& iM)
+KMacierz KMacierz::operator*(const KMacierz& iM) const
 {
     if (n != iM.m)
         throw runtime_error("zly rozmiar macierzy");
 
     KMacierz pro(m, iM.n);
     double buff = 0.0;
-    for (unsigned i{ 0 }; i < m; ++i) {
-        for (unsigned j{ 0 }; j < iM.n; ++j) {
+    for (unsigned i{ 1 }; i <= m; ++i) {
+        for (unsigned j{ 1 }; j <= iM.n; ++j) {
             buff = 0.0;
-            for (unsigned l{ 0 }; l < n; ++l)
-                buff += this->M[i * n + l] * iM.M[l * n + j];
-            pro(i + 1, j + 1) = buff;
+            for (unsigned l{ 1 }; l <= n; ++l)
+                buff += (*this)(i, l) * iM(l, j);
+            pro(i, j) = buff;
         }
     }
     return pro;
 }
 
-KMacierz KMacierz::operator+(const KMacierz& iM)
+KMacierz KMacierz::operator+(const KMacierz& iM) const
 {
     if (this->m != iM.m || this->n != iM.n)
         throw runtime_error("zly rozmiar macierzy");
 
     KMacierz sum(m, n);
-    for (unsigned i{ 0 }; i < m; ++i)
-        for (unsigned j{ 0 }; j < n; ++j)
-            sum(i + 1, j + 1) = this->M[i * n + j] + iM.M[i * n + j];
+    for (unsigned i{ 1 }; i <= m; ++i)
+        for (unsigned j{ 1 }; j <= n; ++j)
+            sum(i, j) = (*this)(i, j) + iM(i, j);
     return sum;
 }
 
-KMacierz KMacierz::operator-(const KMacierz& iM)
+KMacierz KMacierz::operator-(const KMacierz& iM) const
 {
     if (this->m != iM.m || this->n != iM.n)
         throw runtime_error("zly rozmiar macierzy");
 
     KMacierz dif(m, n);
-    for (unsigned i{ 0 }; i < m; ++i)
-        for (unsigned j{ 0 }; j < n; ++j)
-            dif(i + 1, j + 1) = this->M[i * n + j] - iM.M[i * n + j];
+    for (unsigned i{ 1 }; i <= m; ++i)
+        for (unsigned j{ 1 }; j <= n; ++j)
+            dif(i, j) = (*this)(i, j) - iM(i, j);
     return dif;
 }
 
-KMacierz KMacierz::operator*(double iskalar)
+KMacierz KMacierz::operator*(double iskalar) const
 {
     KMacierz pro(m, n);
-    for (unsigned i{ 0 }; i < m; ++i)
-        for (unsigned j{ 0 }; j < n; ++j)
-            pro(i + 1, j + 1) = this->M[i * n + j] * iskalar;
+    for (unsigned i{ 1 }; i <= m; ++i)
+        for (unsigned j{ 1 }; j <= n; ++j)
+            pro(i, j) = (*this)(i, j) * iskalar;
     return pro;
 }
 
@@ -184,25 +177,17 @@ KMacierz KMacierz::operator*(double iskalar)
 
 KMacierz& KMacierz::operator*=(double a)
 {
-    for (unsigned i = 0; i < m; i++)
-    {
-        for (unsigned j = 0; j < n; j++)
-        {
-            this->M[i * n + j] *= a;
-        }
-    }
+    for (unsigned i = 0; i < mRozmiar; i++)
+            this->M[i] *= a;
+
     return *this;
 }
 
 KMacierz& KMacierz::operator+=(double a)
 {
-    for (unsigned i = 0; i < m; i++)
-    {
-        for (unsigned j = 0; j < n; j++)
-        {
-            this->M[i * n + j] += a;
-        }
-    }
+    for (unsigned i = 0; i < mRozmiar; i++)
+        this->M[i] += a;
+
     return *this;
 }
 
@@ -216,12 +201,10 @@ KMacierz& KMacierz::operator+=(double a)
 bool KMacierz::operator!=(double iskalar)
 {
     bool bul = false;
-    for (unsigned i{ 0 }; i < DajM(); ++i) {
-        for (unsigned j{ 0 }; j < DajN(); ++j)
-            if (this->M[i*n+j] - iskalar == 0) {
-                return true;
-            }
-    }
+    for (unsigned i{ 0 }; i < mRozmiar; ++i)
+        if (this->M[i] - iskalar == 0)
+            return true;
+            
     return false;
 }
 
@@ -231,28 +214,19 @@ bool KMacierz::operator!=(double iskalar)
 
 void KMacierz::Zeros()
 {
-    for (unsigned i = 0; i < m * n; i++)
+    for (unsigned i = 0; i < mRozmiar; i++)
         M[i] = 0;
 }
 
-inline unsigned KMacierz::DajM()
+double KMacierz::DajIJ(unsigned i, unsigned j) const
 {
-    return m;
-}
-
-inline unsigned KMacierz::DajN()
-{
-    return n;
-}
-
-double KMacierz::DajIJ(unsigned i, unsigned j)
-{
-    if (i > m || j > n)
+    if (i > m || j > n || i < 1 || j < 1)
         throw runtime_error("Zly indeks");
-    return M[(i - 1) * n + (j - 1)];
+
+    return (*this)(i, j);
 }
 
-bool KMacierz::DodatnioOkreslona()
+bool KMacierz::DodatnioOkreslona() const
 {
     //for (unsigned i(1); i <= n; ++i)
     //{
@@ -261,14 +235,11 @@ bool KMacierz::DodatnioOkreslona()
     return true;
 }
 
-void KMacierz::Wypisz(std::ostream &out)
+void KMacierz::Wypisz(std::ostream &out) const
 {
-    for (unsigned i= 0; i < m; i++)
-    {
-        for (unsigned j = 0; j < n; j++)
-        {
-            out << setprecision(4)<< M[i * n + j] << "\t";
-        }
+    for (unsigned i = 1; i <= m; i++) {
+        for (unsigned j = 1; j <= n; j++)
+            out << fixed << setprecision(4) << (*this)(i, j) << "\t";
         out << "\n";
     }
 }
@@ -276,7 +247,7 @@ void KMacierz::Wypisz(std::ostream &out)
 /////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-KMacierz KMacierz::Inverse()
+KMacierz KMacierz::Inverse() const
 {
     double det = getDeterminant();
     if (det == 0)
@@ -300,7 +271,37 @@ KMacierz KMacierz::Inverse()
     return inverted.T();
 }
 
-double KMacierz::getDeterminant() {
+void KMacierz::RozlozCholeskySelf()
+{
+    double suma;
+    for (unsigned i(1); i <= m; ++i)
+    {
+        for (unsigned j(1); j <= i; ++j)
+        {
+            suma = 0;
+            if (i == j)
+            {
+                for (unsigned k(1); k <= i - 1; ++k)
+                    suma += (*this)(i, k) * (*this)(i, k);
+                (*this)(i, i) = sqrt((*this)(i, i) - suma);
+            }
+            else // j < i
+            {
+                for (unsigned k(1); k <= j - 1; ++k)
+                    suma += (*this)(i, k) * (*this)(j, k);
+                (*this)(i, j) = 1 / (*this)(j, j) * ((*this)(i, j) - suma);
+            }
+        }
+    }
+}
+
+unsigned KMacierz::PobierzPasmo() const
+{
+    return m;
+}
+
+double KMacierz::getDeterminant() const
+{
     if (m != n)
         throw std::runtime_error("Matrix is not quadratic");
     unsigned dim = m;
@@ -331,17 +332,18 @@ double KMacierz::getDeterminant() {
     return result;
 }
 
-KMacierz KMacierz::T()
+KMacierz KMacierz::T() const
 {
     KMacierz trans(n, m);
 
-    for (unsigned i{ 0 }; i < n; ++i)
-        for (unsigned j{ 0 }; j < m; ++j)
-            trans(i + 1, j + 1) = this->M[j * n + i];
+    for (unsigned i{ 1 }; i <= n; ++i)
+        for (unsigned j{ 1 }; j <= m; ++j)
+            trans(i, j) = (*this)(j, i);
     return trans;
 }
 
-KMacierz KMacierz::getCofactor() {
+KMacierz KMacierz::getCofactor() const
+{
     if (m != n)
         throw std::runtime_error("Matrix is not quadratic");
 

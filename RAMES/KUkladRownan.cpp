@@ -2,6 +2,9 @@
 #include "KUkladRownan.h"
 #include <iostream>
 #include <fstream>
+
+#include "KMacierzSPF.h"
+
 using namespace std;
 
 KUkladRownan::KUkladRownan()
@@ -152,38 +155,15 @@ KWektorK* KUkladRownan::RozwiazCholesky()
 	if (!A->DodatnioOkreslona()) // uzupelnic funkcje
 		throw runtime_error("macierz nie jest dodatnio okreslona");
 
-	unsigned m = A->DajM();
-	//KMacierz L(m, m);
+	A->RozlozCholeskySelf(); // A <- L + L^T
 
-	// rozklad choleskyego-banachiewicza
-	double suma;
-	for (unsigned i(1); i <= m; ++i)
-	{
-		for (unsigned j(1); j <= i; ++j)
-		{
-			suma = 0;
-			if (i == j)
-			{
-				for (unsigned k(1); k <= i - 1; ++k)
-					suma += (*A)(i, k) * (*A)(i, k);
-				(*A)(i, i) = sqrt((*A)(i, i) - suma);
-			}
-			else // j < i
-			{
-				for (unsigned k(1); k <= j - 1; ++k)
-					suma += (*A)(i, k) * (*A)(j, k);
-				(*A)(i, j) = 1 / (*A)(j, j) * ((*A)(i, j) - suma);
-			}
-		}
-	}
-	//KMacierz LT((*A).T()); // LT = L^T
+	unsigned m = A->DajM();
+	KWektorK Y(m);
 
 	// Rozwiazujemy uklad L * Y = B
-	KWektorK Y(m);
 	KUkladRownan Ly_b(A, &Y, B);
 	Ly_b.RozwiazEliminacja(0);
 
-	(*A) = ((*A).T()); // LT = gorna trojkatna A
 	// Rozwiazujemy LT * X = Y ;
 	KUkladRownan LTx_y(A, X, &Y);
 	LTx_y.RozwiazEliminacja(1);
@@ -194,15 +174,14 @@ KWektorK* KUkladRownan::RozwiazCholesky()
 KWektorK* KUkladRownan::RozwiazEliminacja(int gorna_dolna)
 {
 	double suma;
+	unsigned promienPasma = (A->PobierzPasmo() + 1) / 2;
 	if (gorna_dolna == 0)
 	{
 		for (unsigned i(1); i <= A->DajM(); ++i)
 		{
 			suma = 0;
-			for (unsigned j(1); j <= i - 1; ++j)
-			{
+			for (unsigned j = (i - promienPasma + 1 > 0 ? i - promienPasma + 1 : 1); j <= i - 1; ++j)
 				suma += (*X)(j) * (*A)(i, j);
-			}
 			(*X)(i) = ((*B)(i) - suma) / (*A)(i, i);
 		}
 	}
@@ -211,10 +190,8 @@ KWektorK* KUkladRownan::RozwiazEliminacja(int gorna_dolna)
 		for (unsigned i(A->DajM()); i >=1 ; --i)
 		{
 			suma = 0;
-			for (unsigned j(A->DajM()); j >= i + 1; --j)
-			{
+			for (unsigned j = (i + promienPasma -1 <= A->DajM() ? i + promienPasma - 1 : A->DajM()); j >= i + 1; --j)
 				suma += (*X)(j) * (*A)(i, j);
-			}
 			(*X)(i) = ((*B)(i) - suma) / (*A)(i, i);
 		}
 	}

@@ -51,6 +51,7 @@ int KPlik::WczytajDane(char* inazwaPliku, KDane* dane)
 		throw runtime_error("Cos jest nie tak z plikiem");
 		return 1;
 	}
+	dane->ClearDane();
 	string line;
 
 	while (pliczek.good())
@@ -88,7 +89,6 @@ int KPlik::WczytajDane(char* inazwaPliku, KDane* dane)
 	}
 	try {
 		dane->FinalizujWczytywanie();
-		dane->mDaneFlag = true;
 	}
 	catch (exception& e)
 	{
