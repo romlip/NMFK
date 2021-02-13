@@ -142,7 +142,7 @@ void CRAMESView::OnUpdateObliczeniaWykonaj(CCmdUI* pCmdUI)
 	CRAMESDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	pCmdUI->Enable(pDoc->dane->mDaneFlag);
+	pCmdUI->Enable(pDoc->bDaneFlag);
 	// TODO: Add your command update UI handler code here
 }
 
@@ -153,7 +153,7 @@ void CRAMESView::OnUpdateWynikiZapisz(CCmdUI* pCmdUI)
 	CRAMESDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	pCmdUI->Enable(pDoc->obliczenia->mObliczeniaFlag);
+	pCmdUI->Enable(pDoc->bObliczeniaFlag);
 	// TODO: Add your command update UI handler code here
 }
 
@@ -163,7 +163,7 @@ void CRAMESView::OnUpdateWynikiZapiszjako(CCmdUI* pCmdUI)
 	CRAMESDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	pCmdUI->Enable(pDoc->obliczenia->mObliczeniaFlag);
+	pCmdUI->Enable(pDoc->bObliczeniaFlag);
 }
 
 
@@ -179,9 +179,9 @@ void CRAMESView::OnObliczeniaUstawienia()
 	if (result == IDOK)
 	{
 		// zageszczanie siatki
-		pDoc->dane->PobierzSiatke()->UstawZageszczanieWstepne(dlgObliczeniaUstawienia.mbZagescWstepnie);
-		pDoc->dane->PobierzSiatke()->UstawKrotnoscZageszczenia(dlgObliczeniaUstawienia.mKrotnoscZageszczenia);
-		pDoc->dane->PobierzSiatke()->Generuj();
+		pDoc->mDane.PobierzSiatke()->UstawZageszczanieWstepne(dlgObliczeniaUstawienia.mbZagescWstepnie);
+		pDoc->mDane.PobierzSiatke()->UstawKrotnoscZageszczenia(dlgObliczeniaUstawienia.mKrotnoscZageszczenia);
+		pDoc->mDane.PobierzSiatke()->Generuj();
 
 		// ustawienia obliczen
 		pDoc->obliczenia->UstawUwzglednianieWarunkowI(dlgObliczeniaUstawienia.mComboBoxWarunkiSelection);
@@ -197,7 +197,7 @@ void CRAMESView::OnUpdateObliczeniaUstawienia(CCmdUI* pCmdUI)
 	CRAMESDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	pCmdUI->Enable(pDoc->dane->mDaneFlag);
+	pCmdUI->Enable(pDoc->bDaneFlag);
 }
 
 
@@ -206,7 +206,7 @@ void CRAMESView::OnUpdateWynikiUstawienia(CCmdUI* pCmdUI)
 	CRAMESDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	pCmdUI->Enable(pDoc->obliczenia->mObliczeniaFlag);
+	pCmdUI->Enable(pDoc->bObliczeniaFlag);
 }
 
 void CRAMESView::OnWynikiUstawienia()

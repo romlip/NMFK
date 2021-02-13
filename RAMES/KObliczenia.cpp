@@ -15,7 +15,6 @@ KObliczenia::KObliczenia()
 	mWyniki = 0;
 	mGestoscAproksymacji = 1;
 	eWarunkiI = EwarunkiI::PAYNE_IRONS;
-	mObliczeniaFlag = false;
 	dane = new KDane();
 	urMES = nullptr;
 }
@@ -152,15 +151,15 @@ void KObliczenia::WypelnijP(KElement1D* e)
 	delete p_e;
 }
 
-void KObliczenia::WypelnijUkladRownan(KElement1D* e)
+void KObliczenia::WstawMacierzLokalna(KElement1D* e)
 {
 	switch (eWarunkiI)
 	{
 	case EwarunkiI::REDUKCJA:
-		WypelnijUkladRownanRedukcja(e);
+		WstawMacierzLokalnaRedukcja(e);
 		break;
 	case EwarunkiI::PAYNE_IRONS:
-		WypelnijUkladRownanPayneIrons(e);
+		WstawMacierzLokalnaPayneIrons(e);
 		break;
 	default:
 		break;
@@ -173,7 +172,7 @@ void KObliczenia::WypelnijKWarunkamiBrzegowymi()
 	//WypelnijWarunkamiIIRodzaju();
 }
 
-void KObliczenia::WypelnijUkladRownanRedukcja(KElement1D* e)
+void KObliczenia::WstawMacierzLokalnaRedukcja(KElement1D* e)
 {
 	KMacierz* k_e = StworzLokalnaMacierzSztywnosci(e);
 	KWektorK* p_e = StworzLokalnyWektorNaprezen(e);
@@ -232,7 +231,7 @@ void KObliczenia::WypelnijUkladRownanRedukcja(KElement1D* e)
 	delete p_e;
 }
 
-void KObliczenia::WypelnijUkladRownanPayneIrons(KElement1D* e)
+void KObliczenia::WstawMacierzLokalnaPayneIrons(KElement1D* e)
 {
 	KMacierz* k_e = StworzLokalnaMacierzSztywnosci(e);
 	KWektorK* p_e = StworzLokalnyWektorNaprezen(e);
@@ -286,10 +285,8 @@ void KObliczenia::WypelnijUkladRownanPayneIrons(KElement1D* e)
 	delete p_e;
 }
 
-KWektorK* KObliczenia::Licz(KDane* idane)
+int KObliczenia::Licz(KDane* idane)
 {
-	if (dane)
-		delete dane;
 	dane = idane;
 	dane->PobierzSiatke()->Generuj();
 
@@ -324,28 +321,28 @@ KWektorK* KObliczenia::Licz(KDane* idane)
 		//		delete f_ksi;
 		//	}
 		//}
-		WypelnijUkladRownan(&*it_e);
+		WstawMacierzLokalna(&*it_e);
 	}
 
 
 	// uwzglednij warunki brzegowe i zrodla punktowe w wektorze naprezen
-	WypelnijZrodlamiPunktowymi(urMES);
-	WypelnijWarunkamiIIRodzaju(urMES);
-	WypelnijWarunkamiKonwekcyjnymi(urMES);
+	WypelnijZrodlamiPunktowymi();
+	WypelnijWarunkamiIIRodzaju();
+	WypelnijWarunkamiKonwekcyjnymi();
 
 	// rozwiaz uklad rownan
 	urMES->Rozwiaz();
 	UstawTemperatureWezlow();
 	//dane->OdstosujSkale();
-	mObliczeniaFlag = true;
 
-	return urMES->PobierzX();
+	return 0;
 }
 
-void KObliczenia::WypiszWynik(ostream& iplik, bool tylkoWezly)
+void KObliczenia::WypiszWynik(ostream& iplik) const
 {
+	using namespace mes::galerkin::funkcje_ksztaltu;
 	UstawFormatWynikow(iplik);
-	iplik << "x [m * "<< dane->PobierzSkale() << "]" << "\t\t" << "T [K]" << "\n";
+	iplik << "x [m]" << "\t\t" << "T [K]" << "\n";
 
 	if (mWyniki == 0)
 	{
@@ -412,7 +409,7 @@ void KObliczenia::WypelnijWarunkamiIRodzaju()
 {
 }
 
-void KObliczenia::WypelnijWarunkamiIIRodzaju(KUkladRownan* ur)
+void KObliczenia::WypelnijWarunkamiIIRodzaju()
 {
 	unsigned il_wezlow_z_war_I = 0;
 	double q;
@@ -431,11 +428,11 @@ void KObliczenia::WypelnijWarunkamiIIRodzaju(KUkladRownan* ur)
 		}
 		// wypelnij globalny wektor naprezen warunkiem
 		q = it_wII.q;
-		(*ur->PobierzB())(it_wII.pWii->PobierzNumer() - il_wezlow_z_war_I) += q;
+		(*urMES->PobierzB())(it_wII.pWii->PobierzNumer() - il_wezlow_z_war_I) += q;
 	}
 }
 
-void KObliczenia::WypelnijWarunkamiKonwekcyjnymi(KUkladRownan* ur)
+void KObliczenia::WypelnijWarunkamiKonwekcyjnymi()
 {
 	unsigned il_wezlow_z_war_I = 0;
 	double h, T_inf;
@@ -456,12 +453,12 @@ void KObliczenia::WypelnijWarunkamiKonwekcyjnymi(KUkladRownan* ur)
 		// wypelnij globalny wektor naprezen warunkiem
 		h = it_wk.h;
 		T_inf = it_wk.T_inf;
-		(*ur->PobierzB())(it_wk.wk->PobierzNumer() - il_wezlow_z_war_I) += h * T_inf;
-		(*ur->PobierzA())(it_wk.wk->PobierzNumer() - il_wezlow_z_war_I, it_wk.wk->PobierzNumer() - il_wezlow_z_war_I) += it_wk.h ;
+		(*urMES->PobierzB())(it_wk.wk->PobierzNumer() - il_wezlow_z_war_I) += h * T_inf;
+		(*urMES->PobierzA())(it_wk.wk->PobierzNumer() - il_wezlow_z_war_I, it_wk.wk->PobierzNumer() - il_wezlow_z_war_I) += it_wk.h ;
 	}
 }
 
-void KObliczenia::WypelnijZrodlamiPunktowymi(KUkladRownan* ur)
+void KObliczenia::WypelnijZrodlamiPunktowymi()
 {
 	unsigned il_wezlow_z_war_I;
 
@@ -479,7 +476,7 @@ void KObliczenia::WypelnijZrodlamiPunktowymi(KUkladRownan* ur)
 				}
 			}
 		}
-		(*ur->PobierzB())(it_zp.pz->PobierzNumer() - il_wezlow_z_war_I) += it_zp.g;
+		(*urMES->PobierzB())(it_zp.pz->PobierzNumer() - il_wezlow_z_war_I) += it_zp.g;
 	}
 }
 
@@ -504,7 +501,7 @@ void KObliczenia::UstawTemperatureWezlow()
 	}
 }
 
-void KObliczenia::UstawFormatWynikow(std::ostream& stream)
+void KObliczenia::UstawFormatWynikow(std::ostream& stream) const
 {
 	stream << fixed << setprecision(6);
 }

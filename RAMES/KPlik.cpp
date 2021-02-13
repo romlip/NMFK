@@ -11,12 +11,7 @@ using namespace std;
 
 KPlik::KPlik()
 {
-	nazwaPliku = "";
-}
-
-KPlik::KPlik(char* inazwaPliku)
-{
-	nazwaPliku = inazwaPliku;
+	Inicjalizuj();
 }
 
 KPlik::~KPlik()
@@ -26,11 +21,11 @@ KPlik::~KPlik()
 ///////////////////////////////////////////////////////////////////////////////
 // wczytuje plik ze struktura i zwraca wskaznik na utworzona w ten sposob siatke
 
-int KPlik::SzukajSpecyfikatora(ifstream& plik, string &line)
+int KPlik::SzukajSpecyfikatora(string &line)
 {
 	string sspecyfikatory[] = {"STRUKTURA", "WARUNKI_BRZEGOWE_I_RODZAJU", "WARUNKI_BRZEGOWE_II_RODZAJU", "WARUNKI_KONWEKCYJNE", "ZRODLA_PUNKTOWE", "ZRODLA_ROZCIAGLE", "LICZBA_WEZLOW_W_ELEMENCIE", "NAZWA", "SKALA" };
 
-	while (getline(plik, line) && plik.good())
+	while (getline(mPlik, line) && mPlik.good())
 	{
 		for(int i = 0; i < sizeof(sspecyfikatory)/sizeof(sspecyfikatory[0]); i++)
 		{
@@ -45,188 +40,200 @@ int KPlik::SzukajSpecyfikatora(ifstream& plik, string &line)
 
 int KPlik::WczytajDane(char* inazwaPliku, KDane* dane)
 {
-	ifstream pliczek(inazwaPliku, ios::in);
-	if (!pliczek.good())
+	UstawDane(dane);
+
+	mPlik.open(inazwaPliku, ios::in);
+	if (!mPlik.good())
 	{
 		throw runtime_error("Cos jest nie tak z plikiem");
 		return 1;
 	}
-	dane->ClearDane();
+	mpDane->Wyczysc();
+
 	string line;
 
-	while (pliczek.good())
+	while (mPlik.good())
 	{
-		switch (SzukajSpecyfikatora(pliczek, line))
+		switch (SzukajSpecyfikatora(line))
 		{
 		case STRUKTURA:
-			CzytajStrukture(pliczek, dane);
+			CzytajStrukture();
 		case WARUNKI_BRZEGOWE_I_RODZAJU:
-			CzytajWarunkiI(pliczek, dane);
+			CzytajWarunkiI();
 			break;
 		case WARUNKI_BRZEGOWE_II_RODZAJU:
-			CzytajWarunkiII(pliczek, dane);
+			CzytajWarunkiII();
 			break;
 		case WARUNKI_KONWEKCYJNE:
-			CzytajWarunkiKonwekcyjne(pliczek, dane);
+			CzytajWarunkiKonwekcyjne();
 			break;
 		case ZRODLA_PUNKTOWE:
-			CzytajZrodlaPunktowe(pliczek, dane);
+			CzytajZrodlaPunktowe();
 			break;
 		case ZRODLA_ROZCIAGLE:
-			CzytajZrodlaRozciagle(pliczek, dane);
+			CzytajZrodlaRozciagle();
 			break;
 		case LICZBA_WEZLOW:
-			CzytajLiczbeWezlow(pliczek, dane, line);
+			CzytajLiczbeWezlow(line);
 			break;
 		case NAZWA:
-			CzytajNazwe(pliczek, dane, line);
+			CzytajNazwe(line);
 			break;
 		case SKALA:
-			CzytajSkale(pliczek, dane, line);
+			CzytajSkale(line);
 		default:
 			break;
 		}
 	}
 	try {
-		dane->FinalizujWczytywanie();
+		mpDane->FinalizujWczytywanie();
 	}
 	catch (exception& e)
 	{
 		MessageBox(NULL, CString(e.what()), _T("Blad wczytywania danych"), MB_OK | MB_ICONWARNING);
-		dane->mDaneFlag = false;
+		mpDane->mDaneFlag = false;
 	}
+
+	mPlik.close();
 
 	return 0;
 }
 
-void KPlik::CzytajWarunkiI(ifstream& plik, KDane* dane)
+void KPlik::UstawDane(KDane* pDane)
+{
+	mpDane = pDane;
+}
+
+
+
+void KPlik::CzytajWarunkiI()
 {
 	string line;
 	double x, T;
 
-	while (getline(plik, line) && line.find(start) == string::npos && plik.good()) {} //szukamy START
+	while (getline(mPlik, line) && line.find(start) == string::npos && mPlik.good()) {} //szukamy START
 	
-	while (getline(plik, line) && line.find(koniec) == string::npos && plik.good()) // czytamy warunki az do KONIEC
+	while (getline(mPlik, line) && line.find(koniec) == string::npos && mPlik.good()) // czytamy warunki az do KONIEC
 	{
 		stringstream sline(line);
 		sline >> x >> T;
 		strukt_warunekI warunek = { x, T, nullptr };
-		dane->DodajWarunekI(warunek);
+		mpDane->DodajWarunekI(warunek);
 	}
 }
 
-void KPlik::CzytajWarunkiII(std::ifstream& plik, KDane* dane)
+void KPlik::CzytajWarunkiII()
 {
 	string line;
 	double x, q;
 
-	while (getline(plik, line) && line.find(start) == string::npos && plik.good()) {} //szukamy START
+	while (getline(mPlik, line) && line.find(start) == string::npos && mPlik.good()) {} //szukamy START
 
-	while (getline(plik, line) && line.find(koniec) == string::npos && plik.good()) // czytamy warunki az do KONIEC
+	while (getline(mPlik, line) && line.find(koniec) == string::npos && mPlik.good()) // czytamy warunki az do KONIEC
 	{
 		stringstream sline(line);
 		sline >> x >> q;
 		strukt_warunekII warunek = { x, q };
-		dane->DodajWarunekII(warunek);
+		mpDane->DodajWarunekII(warunek);
 	}
 }
 
-void KPlik::CzytajWarunkiKonwekcyjne(std::ifstream& plik, KDane* dane)
+void KPlik::CzytajWarunkiKonwekcyjne()
 {
 	string line;
 	double x, h, T_inf;
 
-	while (getline(plik, line) && line.find(start) == string::npos && plik.good()) {} //szukamy START
+	while (getline(mPlik, line) && line.find(start) == string::npos && mPlik.good()) {} //szukamy START
 
-	while (getline(plik, line) && line.find(koniec) == string::npos && plik.good()) // czytamy warunki az do KONIEC
+	while (getline(mPlik, line) && line.find(koniec) == string::npos && mPlik.good()) // czytamy warunki az do KONIEC
 	{
 		stringstream sline(line);
 		sline >> x >> h >> T_inf;
 		strukt_warunek_konwekcyjny warunek = { x, h, T_inf };
-		dane->DodajWarunekKonwekcyjny(warunek);
+		mpDane->DodajWarunekKonwekcyjny(warunek);
 	}
 }
 
-void KPlik::CzytajZrodlaPunktowe(ifstream& plik, KDane* dane)
+void KPlik::CzytajZrodlaPunktowe()
 {
 	string line;
 	double x, g;
 
-	while (getline(plik, line) && line.find(start) == string::npos && plik.good()) {} //szukamy START
+	while (getline(mPlik, line) && line.find(start) == string::npos && mPlik.good()) {} //szukamy START
 
-	while (getline(plik, line) && line.find(koniec) == string::npos && plik.good()) // czytamy warunki az do KONIEC
+	while (getline(mPlik, line) && line.find(koniec) == string::npos && mPlik.good()) // czytamy warunki az do KONIEC
 	{
 		stringstream sline(line);
 		sline >> x >> g;
 		strukt_zrodlo_punktowe zrodlo = { x, g, nullptr };
-		dane->PobierzSiatke()->DodajZrodloPunktowe(zrodlo);
+		mpDane->PobierzSiatke()->DodajZrodloPunktowe(zrodlo);
 	}
 }
 
-void KPlik::CzytajZrodlaRozciagle(std::ifstream& plik, KDane* dane)
+void KPlik::CzytajZrodlaRozciagle()
 {
 	string line;
 	double x, g;
 
-	while (getline(plik, line) && line.find(start) == string::npos && plik.good()) {} //szukamy START
+	while (getline(mPlik, line) && line.find(start) == string::npos && mPlik.good()) {} //szukamy START
 
-	while (getline(plik, line) && line.find(koniec) == string::npos && plik.good()) // czytamy warunki az do KONIEC
+	while (getline(mPlik, line) && line.find(koniec) == string::npos && mPlik.good()) // czytamy warunki az do KONIEC
 	{
 		stringstream sline(line);
 		sline >> x >> g;
 		strukt_zrodlo_rozciagle zrodlo = { x, g }; // [g] = [W/m^2]
-		dane->DodajZrodloRozciagle(zrodlo);
+		mpDane->DodajZrodloRozciagle(zrodlo);
 	}
 }
 
-void KPlik::CzytajStrukture(ifstream& plik, KDane* dane)
+void KPlik::CzytajStrukture()
 {
 	string line;
 	unsigned _nr;
 	double xl, xp, _k, _f;
 
-	while (getline(plik, line) && line.find(start) == string::npos && plik.good()) {} //szukamy START
+	while (getline(mPlik, line) && line.find(start) == string::npos && mPlik.good()) {} //szukamy START
 
-	while (getline(plik, line) && line.find(koniec) == string::npos && plik.good()) // czytamy warunki az do KONIEC
+	while (getline(mPlik, line) && line.find(koniec) == string::npos && mPlik.good()) // czytamy warunki az do KONIEC
 	{
 		stringstream sline(line);
 		sline >> _nr >> xl >> xp >> _k >> _f;
 
-		if (xl < dane->PobierzSiatke()->PobierzXmin())
-			dane->PobierzSiatke()->UstawXmin(xl);
-		if (xp > dane->PobierzSiatke()->PobierzXmax())
-			dane->PobierzSiatke()->UstawXmax(xp);
+		if (xl < mpDane->PobierzSiatke()->PobierzXmin())
+			mpDane->PobierzSiatke()->UstawXmin(xl);
+		if (xp > mpDane->PobierzSiatke()->PobierzXmax())
+			mpDane->PobierzSiatke()->UstawXmax(xp);
 
-		dane->PobierzSiatke()->DodajElement(_nr, xl, xp, _k, _f);
+		mpDane->PobierzSiatke()->DodajElement(_nr, xl, xp, _k, _f);
 	}
 }
 
-void KPlik::CzytajLiczbeWezlow(ifstream& plik, KDane* dane, string& line)
+void KPlik::CzytajLiczbeWezlow(string& line)
 {
 	stringstream sline(line);
 	int liczba_wezlow;
 	string specyf;
 	sline >> specyf >> liczba_wezlow;
-	dane->PobierzSiatke()->UstawLiczbeWezlowWelemencie(liczba_wezlow);
+	mpDane->PobierzSiatke()->UstawLiczbeWezlowWelemencie(liczba_wezlow);
 }
 
-void KPlik::CzytajNazwe(ifstream& plik, KDane* dane, string& line)
+void KPlik::CzytajNazwe(string& line)
 {
 	stringstream sline(line);
 	string specyf;
 	sline >> specyf >> nazwaStruktury;
 }
 
-void KPlik::CzytajSkale(std::ifstream& pliczek, KDane* dane, std::string& line)
+void KPlik::CzytajSkale(string& line)
 {
 	stringstream sline(line);
 	string specyf;
 	double skala;
 	sline >> specyf >> skala;
-	dane->UstawSkale(skala);
+	mpDane->UstawSkale(skala);
 }
 
-void KPlik::ZapiszWynik(KDane* dane, KObliczenia* obliczenia, const char* inazwaPliku)
+void KPlik::ZapiszWynik(const KObliczenia* obliczenia, const char* inazwaPliku)
 {	
 	string wynikiPath;
 	if (inazwaPliku == "")
@@ -234,64 +241,19 @@ void KPlik::ZapiszWynik(KDane* dane, KObliczenia* obliczenia, const char* inazwa
 	else
 		wynikiPath = inazwaPliku;
 
-	ofstream plik(wynikiPath, ios::out);
+	mPlik.open(wynikiPath, ios::out);
 
-	if (plik.good())
-	{
-		obliczenia->WypiszWynik(plik);
-		//plik << "wezly\n";
-		//for (auto it_wezly = dane->PobierzSiatke()->vpWezly.begin(); it_wezly != dane->siatka->vpWezly.end(); ++it_wezly)
-		//{
-		//	plik <<(*it_wezly)->PobierzNumer() <<"\t"<<(*it_wezly)->PobierzX() << "\n";
-		//}
+	if (mPlik.good())
+		obliczenia->WypiszWynik(mPlik);
 
-		//plik << "elementy\n";
-		//for (auto it_elementy = dane->siatka->vElementy.begin(); it_elementy != dane->siatka->vElementy.end(); ++it_elementy)
-		//{
-		//	plik << it_elementy->PobierzNumer() << "\t";
-		//	for (auto it_wezly = it_elementy->PobierzWezly()->begin(); it_wezly != it_elementy->PobierzWezly()->end(); ++it_wezly)
-		//		plik << (*it_wezly)->PobierzX() << "\t";
-		//	plik << it_elementy->Pobierzk() / it_elementy->Pobierzh() << "\n";
-		//}
-	}
-	//plik << "\nmacierz sztywnosci:\n";
+	mPlik.close();
+}
 
-	////KMacierz* K = obliczenia->PobierzGlobalnaMacierzSztywnosci();
-	////K->Wypisz(plik);
-
-	////plik << "\nwektor naprezen:\n";
-	////KWektorK* P = obliczenia->PobierzGlobalnyWektorNaprezen();
-	////P->Wypisz(plik);
-
-	//plik << "\n\nWynik:\n\n";
-
-	//obliczenia->PobierzUkladRownan()->PobierzX()->Wypisz(plik);
-
-	////double tab1[][2] = { {7,2}, {3,-2}, {5,-5} };
-	////KMacierz A(3,2, (double*)tab1);
-	////double tab2[][3] = { {-11,2, 2}, {-2,1, 5} };
-	////KMacierz B(2, 3, (double*)tab2);
-
-	////KMacierz C = A * B;
-	////KMacierz D = C.Inverse();
-	////C.Wypisz(plik);
-	////D.Wypisz(plik);
-	//KMacierz G(3);
-	//for (int i(1); i <= 3; i++)
-	//	for (int j(1); j <= 3; ++j)
-	//		G(i, j) = (i-1) * 3 + j;
-	//G(1, 1) = -1;
-
-	//plik << "\nG:\n";
-	//G.Wypisz(plik);
-
-	//plik << "\ninverse:\n";
-	//(G.Inverse()).Wypisz(plik);
-
-	//plik << "\ndeterminant:" << G.getDeterminant();
-
-	//plik << "\n\ncofactor:\n";
-	//G.getCofactor().Wypisz(plik);
+void KPlik::Inicjalizuj()
+{
+	mpDane = nullptr;
+	nazwaPliku = "";
+	specyfikatory = NAZWA;
 }
 
 

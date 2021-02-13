@@ -13,12 +13,7 @@ using namespace std;
 
 
 KSiatka::KSiatka() {
-    liczba_wezlow_w_elemencie = 2;
-    mfWspolczynnikZageszczania = 3;
-    mbZagescWstepnie = false;
-    muKrotnoscZageszczenia = 0;
-    mfXmax = 0;
-    mfXmin = 0;
+    Inicjalizuj();
 }
 
 KWezel1D* KSiatka::WezelIstnieje(double x_wezla)
@@ -134,6 +129,25 @@ void KSiatka::Zagesc()
             WstawElementZa(pNowyWezel);
         }
     }
+}
+
+void KSiatka::Inicjalizuj()
+{
+    liczba_wezlow_w_elemencie = 2;
+    mbZagescWstepnie = false;
+    muKrotnoscZageszczenia = 0;
+    mfXmin = 0 , mfXmax = 0;
+}
+
+void KSiatka::Wyczysc()
+{
+    mvPunktyZrodlowe.clear();
+    vpWezly_wczytane.clear();
+    vpWezly.clear();
+    vElementy.clear();
+    vStruktura.clear();
+
+    Inicjalizuj();
 }
 
 KWezel1D* KSiatka::DodajWezel(double x)

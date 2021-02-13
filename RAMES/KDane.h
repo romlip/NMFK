@@ -33,8 +33,6 @@ class KDane
 {
 private:
 	double mfSkala;
-	bool mbWarunkiIanalityczne;
-	bool mbWarunkiIpeynIrons;
 	std::vector<strukt_warunekI> warunkiI;
 	std::vector<strukt_warunekII> warunkiII;
 	std::vector<strukt_warunek_konwekcyjny> warunki_konwekcyjne;
@@ -42,7 +40,7 @@ private:
 	std::vector<strukt_zrodlo_punktowe> zrodla_punktowe;
 	std::vector<strukt_zrodlo_rozciagle> zrodla_rozciagle;
 
-	KSiatka* siatka;
+	KSiatka mSiatka;
 
 public:
 	bool mDaneFlag;
@@ -60,7 +58,7 @@ public:
 	void DodajWezlyWarI();
 	void DodajWezlyWarII();
 
-	void ClearDane();
+	void WyczyscDane();
 	void DodajWezlyWarKon();
 	void DodajWarunekI(strukt_warunekI& warunekI);
 	void DodajWarunekII(strukt_warunekII& warunekII);
@@ -76,5 +74,8 @@ public:
 	std::vector<strukt_warunekI>* PobierzWezlyWarI();
 	KSiatka* PobierzSiatke();
 
+	void Inicjalizuj();
+
+	void Wyczysc();
 };
 

@@ -17,7 +17,7 @@ class KSiatka
 {
 private:
 	int liczba_wezlow_w_elemencie; //liczba wezlow w elemencie
-	double mfWspolczynnikZageszczania;
+	const double mfWspolczynnikZageszczania = 3;
 	bool mbZagescWstepnie;
 	unsigned muKrotnoscZageszczenia;
 	double mfXmin, mfXmax;
@@ -28,7 +28,6 @@ private:
 	std::vector<KElement1D> vElementy; // wektor elementow siatki
 	std::vector<KWezel1D*> vpWezly_wczytane; // wektor wskaznikow na wezly wczytane z pliku z uwzglednieniem punktow zrodlowych
 	std::vector<KElement1D> vStruktura; // wektor obszarow
-	std::vector<KWezel1D*> vpWezly_zrodlowe;
 
 public:
 	friend class KPlik;
@@ -60,7 +59,8 @@ public:
 	void Finalizuj();
 	void ZagescWstepnie();
 	void Zagesc();
-	
+	void Inicjalizuj();
+	void Wyczysc();
 
 	void Generuj();
 	int PobierzLiczbeWezlowWelemencie();

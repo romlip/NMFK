@@ -6,32 +6,37 @@
 class KPlik
 {
 private:
+	KDane* mpDane;
+	std::fstream mPlik;
 	char* nazwaPliku;
+
 	enum enum_spec { STRUKTURA , WARUNKI_BRZEGOWE_I_RODZAJU, WARUNKI_BRZEGOWE_II_RODZAJU, WARUNKI_KONWEKCYJNE, ZRODLA_PUNKTOWE, ZRODLA_ROZCIAGLE, LICZBA_WEZLOW, NAZWA, SKALA }
-	specyfikatory;
+		specyfikatory;
 	std::string wynikiDir = "Wyniki\\";
 	const char* start = "START";
 	const char* koniec = "KONIEC";
+
+	int SzukajSpecyfikatora(std::string& line);
+	void CzytajWarunkiI();
+	void CzytajWarunkiII();
+	void CzytajWarunkiKonwekcyjne();
+	void CzytajZrodlaPunktowe();
+	void CzytajZrodlaRozciagle();
+	void CzytajStrukture();
+	void CzytajLiczbeWezlow(std::string& line);
+	void CzytajNazwe(std::string& line);
+	void CzytajSkale(std::string& line);
 
 public:
 	std::string nazwaStruktury;
 
 	KPlik();
-	KPlik(char* inazwaPliku);
 	~KPlik();
 
+	void UstawDane(KDane* pDane);
 	int WczytajDane(char* inazwaPliku, KDane* dane);
+	void ZapiszWynik(const KObliczenia* obliczenia, const char* inazwaPliku = "");
 
-	int SzukajSpecyfikatora(std::ifstream& plik, std::string &line);
-	void CzytajWarunkiI(std::ifstream& plik, KDane* dane);
-	void CzytajWarunkiII(std::ifstream& plik, KDane* dane);
-	void CzytajWarunkiKonwekcyjne(std::ifstream& plik, KDane* dane);
-	void CzytajZrodlaPunktowe(std::ifstream& plik, KDane* dane);
-	void CzytajZrodlaRozciagle(std::ifstream& plik, KDane* dane);
-	void CzytajStrukture(std::ifstream& plik, KDane* dane);
-	void CzytajLiczbeWezlow(std::ifstream& plik, KDane* dane, std::string& line);
-	void CzytajNazwe(std::ifstream& plik, KDane* dane, std::string& line);
-	void CzytajSkale(std::ifstream& pliczek, KDane* dane, std::string& line);
-	void ZapiszWynik(KDane* dane, KObliczenia* obliczenia, const char* inazwaPliku = "");
+	void Inicjalizuj();
 };
 

@@ -51,8 +51,12 @@ protected:
 #endif // SHARED_HANDLERS
 
 public:
-	KPlik* plik;
-	KDane* dane;
+	bool bDaneFlag;
+	bool bObliczeniaFlag;
+	bool bWynikiFlag;
+
+	KPlik mPlik;
+	KDane mDane;
 	KObliczenia* obliczenia;
 	KWektor* wektorWynikowy;
 

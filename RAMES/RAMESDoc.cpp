@@ -38,15 +38,11 @@ CRAMESDoc::CRAMESDoc() noexcept
 {
 	ClearFlags();
 	// TODO: add one-time construction code here
-	dane = new KDane();
-	plik = new KPlik();
 	obliczenia = new KObliczenia();
 }
 
 CRAMESDoc::~CRAMESDoc()
 {
-	if (plik)delete plik;
-	if (dane)delete dane;
 	if (obliczenia)delete obliczenia;
 }
 
@@ -167,50 +163,41 @@ void CRAMESDoc::OnDaneWczytaj()
 
 		sprintf_s(nazwa_pliku, "%S", pathName_CS);
 
-		plik->WczytajDane(nazwa_pliku, dane);
+
+		if (!mPlik.WczytajDane(nazwa_pliku, &mDane))
+		{
+			ClearFlags();
+			bDaneFlag = true;
+		}
 	}
 }
 
 
 void CRAMESDoc::OnWynikiZapisz()
 {
-	// TODO: Add your command handler code here
-	//CString pathName_CS;
-	//char nazwa_pliku[250];
-
-	//TCHAR szFilters[] = _T("Pliki struktur (*.txt)|*.txt|Syckie pliki (*.*)|*.*||");
-
-	//CFileDialog fileDlg(TRUE, _T("wyniki.txt"), _T("*.txt"), OFN_FILEMUSTEXIST | OFN_HIDEREADONLY, szFilters);
-
-	//if (fileDlg.DoModal() == IDOK) {
-	//	pathName_CS = fileDlg.GetPathName();
-	//	//fileName_CS = fileDlg.GetFileTitle();
-
-	//	sprintf_s(nazwa_pliku, "%S", pathName_CS);
-
-	//	
-	//}
-	plik->ZapiszWynik(dane, obliczenia);
+	mPlik.ZapiszWynik(obliczenia);
 }
 
 
 void CRAMESDoc::OnObliczeniaWykonaj()
 {
-	obliczenia->Licz(dane);
+	if (obliczenia->Licz(&mDane) == 0)
+		bObliczeniaFlag = true;
 	// TODO: Add your command handler code here
 }
 
 void CRAMESDoc::ClearFlags()
 {
-	//dane->mDaneFlag = false;
-	//obliczenia->mObliczeniaFlag = false;
+	bDaneFlag = false;
+	bObliczeniaFlag = false;
+	bWynikiFlag = false;
 }
 
 
 void CRAMESDoc::OnWynikiZapiszjako()
 {
 	CString pathName_CS;
-	std::string cDomyslnaNazwaPliku = plik->nazwaStruktury;
+	std::string cDomyslnaNazwaPliku = mPlik.nazwaStruktury;
 
 	char cSciezkaPliku[250];
 
@@ -223,6 +210,6 @@ void CRAMESDoc::OnWynikiZapiszjako()
 
 		sprintf_s(cSciezkaPliku, "%S", pathName_CS);
 
-		plik->ZapiszWynik(dane, obliczenia, cSciezkaPliku);
+		mPlik.ZapiszWynik(obliczenia, cSciezkaPliku);
 	}
 }
