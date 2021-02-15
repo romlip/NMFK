@@ -1,5 +1,5 @@
 #pragma once
-
+#include "RAMESDoc.h"
 
 // DlgObliczeniaUstawienia dialog
 
@@ -17,21 +17,28 @@ public:
 #endif
 
 protected:
+
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
 public:
-	unsigned mKrotnoscZageszczenia;
+	CRAMESDoc *pDoc;
 	BOOL mbZagescWstepnie;
-	unsigned mbLiczbaWezlow;
-	unsigned mbLiczbaElementow;
-	BOOL mbWarunkiIanalityczne;
-	BOOL mbWarunkiIpayneIrons;
-	afx_msg void OnCbnSelchangeCombo1();
+	unsigned mLiczbaWezlow;
+	unsigned mLiczbaElementow;
+	unsigned mKrotnoscZageszczenia;
+
 	CComboBox mComboBoxCtrl;
-	virtual BOOL OnInitDialog();
 	int mComboBoxWarunkiSelection;
+
 	CComboBox mComboBoxRozwiazanieUr;
-	afx_msg void OnCbnSelchangeComboMetodaRozwiazaniaUr();
 	int mComboRozwiazanieUrSelection;
+
+	virtual BOOL OnInitDialog();
+	void InicjalizujComboBoxy();
+	void AktualizujSiatkaInfo();
+	afx_msg void OnCbnSelchangeComboMetodaRozwiazaniaUr();
+	afx_msg void OnCbnSelchangeCombo1();
+	afx_msg void OnBnClickedButtonZagesc();
+	afx_msg void OnStnClickedStaticZagesc();
 };

@@ -51,6 +51,13 @@ KWektorK* KUkladRownan::PobierzX()
 }
 
 
+void KUkladRownan::Ustaw(KMacierz* iA, KWektorK* iX, KWektorK* iB)
+{
+	A = iA;
+	B = iB;
+	X = iX;
+}
+
 void KUkladRownan::UstawA(KMacierz* iA)
 {
 	A = iA;

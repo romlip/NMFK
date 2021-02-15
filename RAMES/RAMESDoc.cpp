@@ -11,7 +11,7 @@
 #endif
 
 #include "RAMESDoc.h"
-
+#include "RAMESView.h"
 #include <propkey.h>
 
 #ifdef _DEBUG
@@ -38,12 +38,10 @@ CRAMESDoc::CRAMESDoc() noexcept
 {
 	ClearFlags();
 	// TODO: add one-time construction code here
-	obliczenia = new KObliczenia();
 }
 
 CRAMESDoc::~CRAMESDoc()
 {
-	if (obliczenia)delete obliczenia;
 }
 
 BOOL CRAMESDoc::OnNewDocument()
@@ -169,20 +167,24 @@ void CRAMESDoc::OnDaneWczytaj()
 			ClearFlags();
 			bDaneFlag = true;
 		}
+		UpdateAllViews(NULL);
 	}
 }
 
 
 void CRAMESDoc::OnWynikiZapisz()
 {
-	mPlik.ZapiszWynik(obliczenia);
+	mPlik.ZapiszWynik(&mObliczenia);
 }
 
 
 void CRAMESDoc::OnObliczeniaWykonaj()
 {
-	if (obliczenia->Licz(&mDane) == 0)
+	if (mObliczenia.Licz(&mDane) == 0)
+	{
 		bObliczeniaFlag = true;
+		UpdateAllViews(NULL);
+	}
 	// TODO: Add your command handler code here
 }
 
@@ -210,6 +212,6 @@ void CRAMESDoc::OnWynikiZapiszjako()
 
 		sprintf_s(cSciezkaPliku, "%S", pathName_CS);
 
-		mPlik.ZapiszWynik(obliczenia, cSciezkaPliku);
+		mPlik.ZapiszWynik(&mObliczenia, cSciezkaPliku);
 	}
 }

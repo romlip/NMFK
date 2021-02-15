@@ -51,6 +51,35 @@ public:
 	afx_msg void OnUpdateObliczeniaUstawienia(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateWynikiUstawienia(CCmdUI* pCmdUI);
 	afx_msg void OnWynikiUstawienia();
+
+private:
+	CRAMESDoc* pDoc;
+	CDC* mpDC;
+	int xp = 150, yp = 50;
+	int xc, yc, ycWykres, ypWykres;
+	double xMinStrukt, xMaxStrukt;
+	double Tmin, Tmax;
+	double skalaX;
+	double* tArray;
+	int liczbaPikseliX, liczbaPikseliY;
+	CFont mFont;
+
+	CRect rectWykres;
+	CRect rectSkala;
+	CRect rectStruktura;
+
+	void RysujStrukture();
+	void RysujSiatke();
+	void RysujWykres();
+	void RysujOsie();
+	void OznaczOsie();
+	void RysujSkaleGradientu();
+	void OznaczOsX(CRect& rect);
+	void OznaczOsY(CRect& rect);
+	void Ramka(const CRect& rect, const CPen& pen);
+	void RysujGradientTemperatury();
+	COLORREF KonwertujTnaGradient(double t, double tMin, double tMax);
+
 };
 
 #ifndef _DEBUG  // debug version in RAMESView.cpp

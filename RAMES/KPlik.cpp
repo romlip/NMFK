@@ -38,9 +38,9 @@ int KPlik::SzukajSpecyfikatora(string &line)
 	return -1;
 }
 
-int KPlik::WczytajDane(char* inazwaPliku, KDane* dane)
+int KPlik::WczytajDane(char* inazwaPliku, KDane* pDane)
 {
-	UstawDane(dane);
+	UstawDane(pDane);
 
 	mPlik.open(inazwaPliku, ios::in);
 	if (!mPlik.good())
@@ -103,8 +103,6 @@ void KPlik::UstawDane(KDane* pDane)
 {
 	mpDane = pDane;
 }
-
-
 
 void KPlik::CzytajWarunkiI()
 {

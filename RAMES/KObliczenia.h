@@ -20,10 +20,11 @@ class KObliczenia
 private:
 	int mWyniki;
 	int mGestoscAproksymacji;
+	double mfTmin, mfTmax;
 
 	EwarunkiI eWarunkiI;
-	KDane* dane;
-	KUkladRownan* urMES;
+	KDane* pDane;
+	KUkladRownan mUrMES;
 
 	KMacierz* StworzLokalnaMacierzSztywnosci(KElement1D* element);
 	KWektorK* StworzLokalnyWektorNaprezen(KElement1D* element);
@@ -60,6 +61,9 @@ public:
 	KMacierz* PobierzGlobalnaMacierzSztywnosci();
 	KWektorK* PobierzGlobalnyWektorNaprezen();
 
+	void WyznaczTwZakresie(double xp, double xk, unsigned n, double* x) const;
+	inline double PobierzTmin() const { return mfTmin; };
+	inline double PobierzTmax() const { return mfTmax; };
 	int Licz(KDane* idane);
 	void WypiszWynik(std::ostream& iplik) const;
 };

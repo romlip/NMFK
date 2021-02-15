@@ -57,8 +57,7 @@ public:
 
 	KPlik mPlik;
 	KDane mDane;
-	KObliczenia* obliczenia;
-	KWektor* wektorWynikowy;
+	KObliczenia mObliczenia;
 
 	afx_msg void OnDaneWczytaj(); //metoda obslugujaca zdarzenie klikniecia na Dane->Wczytaj
 	afx_msg void OnWynikiZapisz();

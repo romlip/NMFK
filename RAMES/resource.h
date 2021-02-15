@@ -5,8 +5,6 @@
 #define IDD_ABOUTBOX                    100
 #define IDP_OLE_INIT_FAILED             100
 #define IDR_POPUP_EDIT                  119
-#define ID_STATUSBAR_PANE1              120
-#define ID_STATUSBAR_PANE2              121
 #define IDS_STATUS_PANE1                122
 #define IDS_STATUS_PANE2                123
 #define IDS_TOOLBAR_STANDARD            124
@@ -36,6 +34,7 @@
 #define IDC_RADIO_TYLKO_WEZLY           316
 #define IDC_RADIO_APROKSYMACJA          317
 #define IDC_EDIT_GESTOSC_APROKSYMACJI   318
+#define IDC_BUTTON_ZAGESC               321
 #define IDC_ZAGESC_WSTEPNIE             1004
 #define IDC_EDIT_LICZBA_WEZLOW          1005
 #define IDC_EDIT_LICZBA_ELEMENTOW       1006
@@ -59,7 +58,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        316
 #define _APS_NEXT_COMMAND_VALUE         32792
-#define _APS_NEXT_CONTROL_VALUE         1022
-#define _APS_NEXT_SYMED_VALUE           321
+#define _APS_NEXT_CONTROL_VALUE         1023
+#define _APS_NEXT_SYMED_VALUE           322
 #endif
 #endif

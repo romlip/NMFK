@@ -28,6 +28,8 @@ public:
 	KMacierz* PobierzA();
 	KWektorK* PobierzB();
 	KWektorK* PobierzX();
+
+	void Ustaw(KMacierz* iA, KWektorK* iX, KWektorK* iB);
 	void UstawA(KMacierz* iA);
 	void UstawB(KWektorK* iB);
 

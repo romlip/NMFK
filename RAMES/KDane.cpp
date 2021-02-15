@@ -66,6 +66,13 @@ void KDane::DodajWezlyWarII()
 
 }
 
+void KDane::DodajWezlyWarunkowBrzegowych()
+{
+	DodajWezlyWarI();
+	DodajWezlyWarII();
+	DodajWezlyWarKon();
+}
+
 void KDane::WyczyscDane()
 {
 	// siatka.clear();
@@ -192,11 +199,10 @@ vector<strukt_warunek_konwekcyjny>* KDane::PobierzWarunkiKonwekcyjne()
 
  void KDane::FinalizujWczytywanie()
  {
-	 mSiatka.Finalizuj();
 	 //ZastosujSkale();
-	 DodajWezlyWarI(); // dodaj wskazniki wezlow warunku I w wektorze warunkiI
-	 DodajWezlyWarII();
-	 DodajWezlyWarKon(); // dodaj wskazniki wezlow warunk konwekcyjnego w wektorze warunki_konwekcyjne
+	 mSiatka.Finalizuj();
+	 DodajWezlyWarunkowBrzegowych();// dodaj wskazniki na wezly warunkow brzegowych
 	 SprawdzPoprawnoscDanych();
+
 	 mDaneFlag = true;
  }

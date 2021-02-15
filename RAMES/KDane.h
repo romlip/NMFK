@@ -58,6 +58,8 @@ public:
 	void DodajWezlyWarI();
 	void DodajWezlyWarII();
 
+	void DodajWezlyWarunkowBrzegowych();
+
 	void WyczyscDane();
 	void DodajWezlyWarKon();
 	void DodajWarunekI(strukt_warunekI& warunekI);
