@@ -55,7 +55,7 @@ public:
 private:
 	CRAMESDoc* pDoc;
 	CDC* mpDC;
-	int xp = 150, yp = 50;
+	int xp = 150, yp = 100;
 	int xc, yc, ycWykres, ypWykres;
 	double xMinStrukt, xMaxStrukt;
 	double Tmin, Tmax;
@@ -64,6 +64,7 @@ private:
 	int liczbaPikseliX, liczbaPikseliY;
 	CFont mFont;
 
+	CRect rectOkna;
 	CRect rectWykres;
 	CRect rectSkala;
 	CRect rectStruktura;
@@ -73,6 +74,7 @@ private:
 	void RysujWykres();
 	void RysujOsie();
 	void OznaczOsie();
+	void RysujInfo();
 	void RysujSkaleGradientu();
 	void OznaczOsX(CRect& rect);
 	void OznaczOsY(CRect& rect);

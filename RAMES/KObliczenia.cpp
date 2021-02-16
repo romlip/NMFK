@@ -15,6 +15,10 @@ KObliczenia::KObliczenia()
 	mfTmin = -1;
 	mfTmax = -1;
 	mWyniki = 0;
+	mWynikiLiczbaPunktow = 100;
+	mWynikiStalyKrok = 0.1;
+	mWynikiZakresMax = 0;
+	mWynikiZakresMin = 0;
 	mGestoscAproksymacji = 1;
 	eWarunkiI = EwarunkiI::PAYNE_IRONS;
 	pDane = nullptr;
@@ -24,7 +28,7 @@ KObliczenia::~KObliczenia()
 {
 }
 
-void KObliczenia::UstawWynikiTylkoWezly(int wyniki)
+void KObliczenia::UstawWynikiRozklad(int wyniki)
 {
 	mWyniki = wyniki;
 }
@@ -202,11 +206,11 @@ void KObliczenia::WstawMacierzLokalnaRedukcja(KElement1D* e)
 	{
 		if (any_of(wezly_war_I.begin(), wezly_war_I.end(), [&](const int& ity) { return ity == i; }))
 			continue;
-		for (unsigned j = 1; j <= k_e->DajN(); j++) // iteruj po kolumnach lokalnej macierzy sztywnosci k
+		for (unsigned j = i; j <= k_e->DajN(); j++) // iteruj po kolumnach lokalnej macierzy sztywnosci k
 		{
 			if (any_of(wezly_war_I.begin(), wezly_war_I.end(), [&](const int& ity) { return ity == j; }))
 				continue;
-			(*mUrMES.PobierzA())(e->PobierzWezel(i)->PobierzNumer() - il_wezlow_war_I_przed[i - 1], e->PobierzWezel(j)->PobierzNumer() - il_wezlow_war_I_przed[j - 1]) += k_e->DajIJ(i, j);
+			(*mUrMES.PobierzA())(e->PobierzWezel(i)->PobierzNumer() - il_wezlow_war_I_przed[i - 1], e->PobierzWezel(j)->PobierzNumer() - il_wezlow_war_I_przed[j - 1]) += (*k_e)(i, j);
 		}
 	}
 
@@ -223,7 +227,7 @@ void KObliczenia::WstawMacierzLokalnaRedukcja(KElement1D* e)
 		{
 			wyraz_warI = (*k_e)(i, it_wI) * e->PobierzWezel(it_wI)->PobierzTemperature();
 		}
-		(*mUrMES.PobierzB())(globalny_nr) += p_e->DajI(i) - wyraz_warI;
+		(*mUrMES.PobierzB())(globalny_nr) += (*p_e)(i) - wyraz_warI;
 	}
 
 	delete k_e;
@@ -289,7 +293,7 @@ int KObliczenia::Licz(KDane* idane)
 	pDane = idane;
 	//pDane->PobierzSiatke()->Generuj();
 
-	unsigned il_warunkow_I = (unsigned)pDane->PobierzWarunkiI()->size();;
+	unsigned il_warunkow_I = (unsigned)pDane->PobierzWarunkiI()->size();
 	unsigned rozmiar = (unsigned)pDane->PobierzSiatke()->vpWezly.size();
 
 	// tworzenie i wypelnianie ukladu rownan
@@ -322,7 +326,6 @@ int KObliczenia::Licz(KDane* idane)
 		WstawMacierzLokalna(&*it_e);
 	}
 
-
 	// uwzglednij warunki brzegowe i zrodla punktowe w wektorze naprezen
 	WypelnijZrodlamiPunktowymi();
 	WypelnijWarunkamiIIRodzaju();
@@ -342,59 +345,104 @@ void KObliczenia::WypiszWynik(ostream& iplik) const
 
 	UstawFormatWynikow(iplik);
 	iplik << "x [m]" << "\t\t" << "T [K]" << "\n";
+	
+	double X, dx, TT, Xc;
 
-	if (mWyniki == 0)
+	switch (mWyniki)
 	{
-		for (auto it_w : *pDane->PobierzSiatke()->PobierzWezly())
-		{
-			iplik << it_w->PobierzX() << "\t" << it_w->PobierzTemperature() << "\n";
-		}
+	case 0: //temperatura tylko w wezlach
+	{
+			for (auto it_w : *pDane->PobierzSiatke()->PobierzWezly())
+			{
+				if (it_w->PobierzX() >= mWynikiZakresMin && it_w->PobierzX() <= mWynikiZakresMax)
+					iplik << it_w->PobierzX() << "\t" << it_w->PobierzTemperature() << "\n";
+			}
+			break;
 	}
-	else if (mWyniki == 1)
+	case 1: // apkrosmyacja w punktach niewwezlowych
 	{
-		double X, Xi, Xj, Xk, Ti, Tj, Tk, dx, TT;
-
 		if (pDane->PobierzSiatke()->PobierzLiczbeWezlowWelemencie() == 2)
 		{
-			for (auto it_e : *pDane->PobierzSiatke()->PobierzElementy())
+			for (auto it_e = pDane->PobierzSiatke()->PobierzElementy()->begin(); it_e != pDane->PobierzSiatke()->PobierzElementy()->end(); ++it_e)
 			{
-				Xi = it_e.PobierzWezel(1)->PobierzX();
-				Xj = it_e.PobierzWezel(2)->PobierzX();
-				Ti = it_e.PobierzWezel(1)->PobierzTemperature();
-				Tj = it_e.PobierzWezel(2)->PobierzTemperature();
-
-				dx = it_e.Pobierzh() / mGestoscAproksymacji;
-
+				dx = it_e->Pobierzh() / (mGestoscAproksymacji + 2);
+				X = it_e->PobierzWezel(1)->PobierzX();
 				for (int i(0); i < mGestoscAproksymacji; ++i)
 				{
-					X = Xi + i * dx;
-					TT = T2(X, Xi, Ti, Xj, Tj);
-					iplik << X  << TT << "\n";
+					if (X >= mWynikiZakresMin && X <= mWynikiZakresMax)
+					{
+						TT = T2(X, it_e->PobierzWezel(1)->PobierzX(), it_e->PobierzWezel(1)->PobierzTemperature(), it_e->PobierzWezel(2)->PobierzX(),
+							 it_e->PobierzWezel(2)->PobierzTemperature());
+						iplik << X << "\t" << TT << "\n";
+					}
+					X += dx;
 				}
 			}
-			iplik << (pDane->PobierzSiatke()->PobierzElementy()->end() - 1)->PobierzWezel(2)->PobierzX() << "\t" << (pDane->PobierzSiatke()->PobierzElementy()->end() - 1)->PobierzWezel(2)->PobierzTemperature() << "\n";
 		}
 		else if (pDane->PobierzSiatke()->PobierzLiczbeWezlowWelemencie() == 3)
 		{
-			for (auto it_e : *pDane->PobierzSiatke()->PobierzElementy())
+			for (auto it_e = pDane->PobierzSiatke()->PobierzElementy()->begin(); it_e != pDane->PobierzSiatke()->PobierzElementy()->end(); ++it_e)
 			{
-				Xi = it_e.PobierzWezel(1)->PobierzX();
-				Xj = it_e.PobierzWezel(2)->PobierzX();
-				Xk = it_e.PobierzWezel(3)->PobierzX();
-				Ti = it_e.PobierzWezel(1)->PobierzTemperature();
-				Tj = it_e.PobierzWezel(2)->PobierzTemperature();
-				Tk = it_e.PobierzWezel(3)->PobierzTemperature();
-
-				dx = it_e.Pobierzh() / mGestoscAproksymacji;
-
+				dx = it_e->Pobierzh() / (mGestoscAproksymacji + 3);
+				X = it_e->PobierzWezel(1)->PobierzX();
 				for (int i(0); i < mGestoscAproksymacji; ++i)
 				{
-					X = Xi + i * dx;
-					TT = T3(X, Xi, Ti, Xj, Tj, Xk, Tk);
-					iplik  << X << "\t" << TT << "\n";
+					if (X >= mWynikiZakresMin && X <= mWynikiZakresMax)
+					{
+						TT = T3(X, it_e->PobierzWezel(1)->PobierzX(), it_e->PobierzWezel(1)->PobierzTemperature(), it_e->PobierzWezel(2)->PobierzX(), it_e->PobierzWezel(2)->PobierzTemperature(), it_e->PobierzWezel(3)->PobierzX(), it_e->PobierzWezel(3)->PobierzTemperature());
+						iplik << X << "\t" << TT << "\n";
+					}
+					X += dx;
 				}
 			}
-			iplik << (pDane->PobierzSiatke()->PobierzElementy()->end() - 1)->PobierzWezel(3)->PobierzX() << "\t" << (pDane->PobierzSiatke()->PobierzElementy()->end() - 1)->PobierzWezel(3)->PobierzTemperature() << "\n";
+		}
+		break;
+	}
+	case 2: // liczba punktow
+	{
+		dx = (mWynikiZakresMax - mWynikiZakresMin) / (mWynikiLiczbaPunktow - 1);
+		break;
+	}
+	case 3: // staly krok
+	{
+		dx = mWynikiStalyKrok;
+		break;
+	}
+	default:
+	{
+		break;
+	}
+
+	}
+
+	if (mWyniki == 2 || mWyniki == 3) 
+	{
+		X = mWynikiZakresMin;
+
+		if (pDane->PobierzSiatke()->PobierzLiczbeWezlowWelemencie() == 2)
+		{
+			for (auto it_e = pDane->PobierzSiatke()->PobierzElementy()->begin(); it_e != pDane->PobierzSiatke()->PobierzElementy()->end(); ++it_e)
+			{
+				Xc = (*(it_e->PobierzWezly()->end() - 1))->PobierzX();
+				while (X <= Xc && X >= mWynikiZakresMin && X <= mWynikiZakresMax) {
+					TT = T2(X, it_e->PobierzWezel(1)->PobierzX(), it_e->PobierzWezel(1)->PobierzTemperature(), it_e->PobierzWezel(2)->PobierzX(),
+						it_e->PobierzWezel(2)->PobierzTemperature());
+					iplik << X << "\t" << TT << "\n";
+					X += dx;
+				}
+			}
+		}
+		else if (pDane->PobierzSiatke()->PobierzLiczbeWezlowWelemencie() == 3)
+		{
+			for (auto it_e = pDane->PobierzSiatke()->PobierzElementy()->begin(); it_e != pDane->PobierzSiatke()->PobierzElementy()->end(); ++it_e)
+			{
+				Xc = (*(it_e->PobierzWezly()->end() - 1))->PobierzX();
+				while (X <= Xc && X >= mWynikiZakresMin && X <= mWynikiZakresMax) {
+					TT = T3(X, it_e->PobierzWezel(1)->PobierzX(), it_e->PobierzWezel(1)->PobierzTemperature(), it_e->PobierzWezel(2)->PobierzX(), it_e->PobierzWezel(2)->PobierzTemperature(), it_e->PobierzWezel(3)->PobierzX(), it_e->PobierzWezel(3)->PobierzTemperature());
+					iplik << X << "\t" << TT << "\n";
+					X += dx;
+				}
+			}
 		}
 	}
 }
@@ -503,9 +551,16 @@ void KObliczenia::UstawTemperatureWezlow()
 
 		if (t < mfTmin) mfTmin = t;
 		else if (t > mfTmax) mfTmax = t;
-
 		(*it_w)->UstawTemperature(t);
 		++i;
+	}
+	for (auto itpw = pDane->PobierzWarunkiI()->begin(); itpw != pDane->PobierzWarunkiI()->end(); ++itpw)
+	{
+		t = itpw->pw->PobierzTemperature();
+		if (t < mfTmin)
+			mfTmin = t;
+		else if (t > mfTmax)
+			mfTmax = t;
 	}
 }
 
@@ -537,32 +592,29 @@ KWektorK* KObliczenia::PobierzGlobalnyWektorNaprezen()
 
 void KObliczenia::WyznaczTwZakresie(double xp, double xk, unsigned n, double* t) const
 {
-	if (xp < pDane->PobierzSiatke()->PobierzXmin() || xk > pDane->PobierzSiatke()->PobierzXmax())
-	{
-		throw runtime_error("wspolrzedna poza zakresem struktury");
-	}
-
 	using namespace mes::galerkin::funkcje_ksztaltu;
 
-	double X, Xi, Xj, Xk, Ti, Tj, Tk, Xc;
+	if (xp < pDane->PobierzSiatke()->PobierzXmin() || xk > pDane->PobierzSiatke()->PobierzXmax())
+		throw runtime_error("wspolrzedna poza zakresem struktury");
+
+	double X, Xi, Xj, Xk, Ti, Tj, Tk, Xc, dx;
 	unsigned i = 0;
 	X = xp;
+	dx = (xk - xp) / (n - 1);
 	if (pDane->PobierzSiatke()->PobierzLiczbeWezlowWelemencie() == 2)
 	{
 		for (auto it_e = pDane->PobierzSiatke()->PobierzElementy()->begin(); it_e != pDane->PobierzSiatke()->PobierzElementy()->end(); ++it_e)
 		{
 			Xc = (*(it_e->PobierzWezly()->end() - 1))->PobierzX();
+			Xi = it_e->PobierzWezel(1)->PobierzX();
+			Xj = it_e->PobierzWezel(2)->PobierzX();
+			Ti = it_e->PobierzWezel(1)->PobierzTemperature();
+			Tj = it_e->PobierzWezel(2)->PobierzTemperature();
 			while (X <= Xc)
 			{
-				Xi = it_e->PobierzWezel(1)->PobierzX();
-				Xj = it_e->PobierzWezel(2)->PobierzX();
-				Ti = it_e->PobierzWezel(1)->PobierzTemperature();
-				Tj = it_e->PobierzWezel(2)->PobierzTemperature();
 				t[i]  = T2(X, Xi, Ti, Xj, Tj);
-
 				i++;
-				X = xp + i * (xk - xp) / (n-1);
-				//if (i == n - 1) break;
+				X = xp + i * dx;
 			}
 		}
 	}
@@ -571,20 +623,42 @@ void KObliczenia::WyznaczTwZakresie(double xp, double xk, unsigned n, double* t)
 		for (auto it_e = pDane->PobierzSiatke()->PobierzElementy()->begin(); it_e != pDane->PobierzSiatke()->PobierzElementy()->end(); ++it_e)
 		{
 			Xc = (*(it_e->PobierzWezly()->end() - 1))->PobierzX();
+			Xi = it_e->PobierzWezel(1)->PobierzX();
+			Xj = it_e->PobierzWezel(2)->PobierzX();
+			Xk = it_e->PobierzWezel(3)->PobierzX();
+			Ti = it_e->PobierzWezel(1)->PobierzTemperature();
+			Tj = it_e->PobierzWezel(2)->PobierzTemperature();
+			Tk = it_e->PobierzWezel(3)->PobierzTemperature();
 			while (X <= Xc)
 			{
-				Xi = it_e->PobierzWezel(1)->PobierzX();
-				Xj = it_e->PobierzWezel(2)->PobierzX();
-				Xk = it_e->PobierzWezel(3)->PobierzX();
-				Ti = it_e->PobierzWezel(1)->PobierzTemperature();
-				Tj = it_e->PobierzWezel(2)->PobierzTemperature();
-				Tk = it_e->PobierzWezel(3)->PobierzTemperature();
 				t[i] = T3(X, Xi, Ti, Xj, Tj, Xk, Tk);
-
 				i++;
-				X = xp + i * (xk - xp) / (n - 1);
-				//if (i == n - 1) break;
+				X = xp+ i * dx;
 			}
 		}
 	}
+}
+void KObliczenia::UstawWynikiCzyZakres(bool zakres) {
+	mbWynikiCzyZakres = zakres;
+}
+void KObliczenia::UstawWynikiZakres(double zakresMin, double zakresMax)
+{
+	if (mbWynikiCzyZakres)
+	{
+		mWynikiZakresMin = zakresMin;
+		mWynikiZakresMax = zakresMax;
+	}
+	else
+	{
+		mWynikiZakresMin = pDane->PobierzSiatke()->PobierzXmin();
+		mWynikiZakresMax = pDane->PobierzSiatke()->PobierzXmax();
+	}
+}
+void KObliczenia::UstawWynikiLiczbaPunktow(unsigned liczbaPunktow)
+{
+	mWynikiLiczbaPunktow = liczbaPunktow;
+}
+void KObliczenia::UstawWynikiStalyKrok(double krok)
+{
+	mWynikiStalyKrok = krok;
 }

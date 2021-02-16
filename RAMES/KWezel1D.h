@@ -15,9 +15,9 @@ public:
 	void UstawNumer(unsigned inumer);
 	void UstawTemperature(double);
 
-	unsigned PobierzNumer();
-	double PobierzX();
-	double PobierzTemperature();
+	inline unsigned PobierzNumer() const { return numer; };
+	inline double PobierzX() const { return x; };
+	inline double PobierzTemperature() const { return temperatura; };
 };
 
 

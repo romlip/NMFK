@@ -61,7 +61,7 @@ KMacierzA KMacierzA::operator-(KMacierzA& iM) {
 KMacierzA KMacierzA::operator*(KMacierzA& iM) {
     KMacierzA pro(w, iM.getKolumny());
     if (k == iM.getWiersze()){
-        float buff = 0.0;
+        double buff = 0.0;
         for (unsigned i{ 0 }; i < w; ++i){
             for (unsigned j{ 0 }; j < iM.getKolumny(); ++j){
                 buff = 0.0;
@@ -90,7 +90,7 @@ KMacierzA KMacierzA::operator*(KMacierzA& iM) {
     }
 }*/
 
-bool KMacierzA::operator!=(float iskalar) {
+bool KMacierzA::operator!=(double iskalar) {
     bool bul = false;
     for (unsigned i{ 0 }; i < M.size(); ++i) {
         for (unsigned j{ 0 }; j < k; ++j)
@@ -101,7 +101,7 @@ bool KMacierzA::operator!=(float iskalar) {
     return false;
 }
 
-KMacierzA KMacierzA::operator+(float iskalar) {
+KMacierzA KMacierzA::operator+(double iskalar) {
     KMacierzA sum(w, k);
     for (unsigned i{ 0 }; i < w; ++i)
         for (unsigned j{ 0 }; j < k; ++j)
@@ -109,7 +109,7 @@ KMacierzA KMacierzA::operator+(float iskalar) {
     return sum;
 }
 
-KMacierzA KMacierzA::operator-(float iskalar) {
+KMacierzA KMacierzA::operator-(double iskalar) {
     KMacierzA dif(w, k);
     for (unsigned i{ 0 }; i < w; ++i)
         for (unsigned j{ 0 }; j < k; ++j)
@@ -117,7 +117,7 @@ KMacierzA KMacierzA::operator-(float iskalar) {
     return dif;
 }
 
-KMacierzA KMacierzA::operator*(float iskalar) {
+KMacierzA KMacierzA::operator*(double iskalar) {
     KMacierzA pro(w, k);
     for (unsigned i{ 0 }; i < w; ++i)
         for (unsigned j{ 0 }; j < k; ++j)
@@ -125,7 +125,7 @@ KMacierzA KMacierzA::operator*(float iskalar) {
     return pro;
 }
 
-KMacierzA KMacierzA::operator/(float iskalar) {
+KMacierzA KMacierzA::operator/(double iskalar) {
     KMacierzA quo(w, k);
     for (unsigned i{ 0 }; i < w; ++i)
         for (unsigned j{ 0 }; j < k; ++j)
@@ -134,7 +134,7 @@ KMacierzA KMacierzA::operator/(float iskalar) {
 }
 
 // Returns value of given location when asked in the form A(x,y)
-float& KMacierzA::operator()(const unsigned& rowNo, const unsigned& colNo){
+double& KMacierzA::operator()(const unsigned& rowNo, const unsigned& colNo){
     return this->M[rowNo][colNo];
 }
 
@@ -177,7 +177,7 @@ KMacierzA KMacierzA::Inverse() {
         throw std::runtime_error("Determinant is 0");
 
     double d = 1.0/getDeterminant(M);
-    std::vector<std::vector<float>> invertigation(M.size(), std::vector<float> (M.size()));
+    std::vector<std::vector<double>> invertigation(M.size(), std::vector<double> (M.size()));
 
     for (size_t i{ 0 }; i < M.size(); ++i)
         for (size_t j{ 0 }; j < M.size(); ++j)
@@ -193,7 +193,7 @@ KMacierzA KMacierzA::Inverse() {
     return inverted.T();
 }
 
-float getDeterminant(const std::vector<std::vector<float>> vect) {
+double getDeterminant(const std::vector<std::vector<double>> vect) {
     if (vect.size() != vect[0].size())
         throw std::runtime_error("Matrix is not quadratic");
 
@@ -206,7 +206,7 @@ float getDeterminant(const std::vector<std::vector<float>> vect) {
     int sign = 1;
     for (int i{ 0 }; i < dimension; ++i) {
         //Submatrix
-        std::vector<std::vector<float>> subVect(dimension - 1, std::vector<float>(dimension - 1));
+        std::vector<std::vector<double>> subVect(dimension - 1, std::vector<double>(dimension - 1));
         for (int m = 1; m < dimension; m++) {
             int z = 0;
             for (int n = 0; n < dimension; n++) {
@@ -224,12 +224,12 @@ float getDeterminant(const std::vector<std::vector<float>> vect) {
     return result;
 }
 
-std::vector<std::vector<float>> getCofactor(const std::vector<std::vector<float>> vect) {
+std::vector<std::vector<double>> getCofactor(const std::vector<std::vector<double>> vect) {
     if (vect.size() != vect[0].size())
         throw std::runtime_error("Matrix is not quadratic");
 
-    std::vector<std::vector<float>> solution(vect.size(), std::vector<float>(vect.size()));
-    std::vector<std::vector<float>> subVect(vect.size() - 1, std::vector<float>(vect.size() - 1));
+    std::vector<std::vector<double>> solution(vect.size(), std::vector<double>(vect.size()));
+    std::vector<std::vector<double>> subVect(vect.size() - 1, std::vector<double>(vect.size() - 1));
 
     for (std::size_t i = 0; i < vect.size(); i++) {
         for (std::size_t j = 0; j < vect[0].size(); j++) {

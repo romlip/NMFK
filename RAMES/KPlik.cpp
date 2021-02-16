@@ -247,6 +247,11 @@ void KPlik::ZapiszWynik(const KObliczenia* obliczenia, const char* inazwaPliku)
 	mPlik.close();
 }
 
+string* KPlik::PobierzNazwe()
+{
+	return &nazwaStruktury;
+}
+
 void KPlik::Inicjalizuj()
 {
 	mpDane = nullptr;

@@ -16,7 +16,7 @@ class KMacierzA
 protected:
 	unsigned w;		// liczba wierszy
 	unsigned k;		// liczba kolumn
-	std::vector<std::vector<float>> M;
+	std::vector<std::vector<double>> M;
 
 public:
 	KMacierzA();
@@ -30,13 +30,13 @@ public:
 	KMacierzA operator-(KMacierzA& iM);
 	KMacierzA operator*(KMacierzA& iM);
 //	void operator=(KMacierzA& iM);
-	bool KMacierzA::operator!=(float skalar);
-	KMacierzA operator+(float iskalar);
-	KMacierzA operator-(float iskalar);
-	KMacierzA operator*(float iskalar);
-	KMacierzA operator/(float iskalar);
+	bool KMacierzA::operator!=(double skalar);
+	KMacierzA operator+(double iskalar);
+	KMacierzA operator-(double iskalar);
+	KMacierzA operator*(double iskalar);
+	KMacierzA operator/(double iskalar);
 
-	float& operator()(const unsigned&, const unsigned&);
+	double& operator()(const unsigned&, const unsigned&);
 
 	unsigned getWiersze() const;
 	unsigned getKolumny() const;
@@ -48,8 +48,8 @@ public:
 
 	/*
 	// Power Iteration
-	std::tuple<KMacierz, float, int> powerIter(unsigned, float);
+	std::tuple<KMacierz, double, int> powerIter(unsigned, double);
 	// Deflation
-	KMacierz deflation(KMacierz&, float&);
+	KMacierz deflation(KMacierz&, double&);
 	*/
 };

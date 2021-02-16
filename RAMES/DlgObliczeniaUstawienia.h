@@ -23,7 +23,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	CRAMESDoc *pDoc;
-	BOOL mbZagescWstepnie;
+	BOOL mbCheckZagescWstepnie;
 	unsigned mLiczbaWezlow;
 	unsigned mLiczbaElementow;
 	unsigned mKrotnoscZageszczenia;
@@ -38,7 +38,9 @@ public:
 	void InicjalizujComboBoxy();
 	void AktualizujSiatkaInfo();
 	afx_msg void OnCbnSelchangeComboMetodaRozwiazaniaUr();
-	afx_msg void OnCbnSelchangeCombo1();
-	afx_msg void OnBnClickedButtonZagesc();
-	afx_msg void OnStnClickedStaticZagesc();
+	afx_msg void OnBnClickedButtonGeneruj();
+	void InicjalizujRadioLiczbaWezlow();
+	void InicjalizujEditKrotnoscZageszczenia();
+	BOOL mbCheckZagescXkrotnie;
+	int mRadioLiczbaWezlow;
 };

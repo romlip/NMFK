@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "KDane.h"
 
 using namespace std;
@@ -127,7 +127,35 @@ void KDane::SprawdzPoprawnoscDanych()
 	}
 
 	// sprawdz czy wspolredne warunkow brzegowych i punktow zrodlowych mieszcza sie w strukturze
-
+	for (auto it_e : warunkiI) {
+		if (it_e.x != mSiatka.PobierzXmin() && it_e.x != mSiatka.PobierzXmax())
+		{
+			WyczyscDane();
+			throw runtime_error("Warunki brzegowe I rodzaju nie pokrywają się z brzegami");
+		}
+	}
+	for (auto it_e : warunkiII) {
+		if (it_e.x != mSiatka.PobierzXmin() && it_e.x != mSiatka.PobierzXmax())
+		{
+			WyczyscDane();
+			throw runtime_error("Warunki brzegowe II rodzaju nie pokrywają się z brzegami");
+		}
+	}
+	for (auto it_e : warunki_konwekcyjne) {
+		if (it_e.x != mSiatka.PobierzXmin() && it_e.x != mSiatka.PobierzXmax())
+		{
+			WyczyscDane();
+			throw runtime_error("Warunki konwekcyjne nie pokrywają się z brzegami");
+		}
+	}
+	for (auto it_zp : zrodla_punktowe)
+	{
+		if (it_zp.x < mSiatka.PobierzXmin() || it_zp.x > mSiatka.PobierzXmax())
+		{
+			WyczyscDane();
+			throw runtime_error("Punktowe zrodla pola leza poza struktura");
+		}
+	}
 
 	//sprawdz spojnosc obszarow
 	for (auto it_e = mSiatka.PobierzElementy()->begin(); it_e + 1 != mSiatka.PobierzElementy()->end(); ++it_e)

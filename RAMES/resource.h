@@ -31,10 +31,17 @@
 #define IDC_COMBO_WARUNKI_I             313
 #define IDC_COMBO_METODA_ROZWIAZANIA_UR 314
 #define IDD_DIALOG_WYNIKI_USTAWIENIA    315
-#define IDC_RADIO_TYLKO_WEZLY           316
 #define IDC_RADIO_APROKSYMACJA          317
 #define IDC_EDIT_GESTOSC_APROKSYMACJI   318
-#define IDC_BUTTON_ZAGESC               321
+#define IDC_BUTTON_GENERUJ              322
+#define IDC_CHECK_ZAGESC_XKROTNIE       323
+#define IDC_RADIO_LICZBA_WEZLOW         324
+#define IDC_RADIO_ROZKLAD               325
+#define IDC_RADIO_ZAKRES                326
+#define IDC_EDIT_LICZBA_PUNKTOW         329
+#define IDC_EDIT_STALY_KROK             330
+#define IDC_EDIT_ZAKRES_OD              331
+#define IDC_EDIT_ZAKRES_DO              332
 #define IDC_ZAGESC_WSTEPNIE             1004
 #define IDC_EDIT_LICZBA_WEZLOW          1005
 #define IDC_EDIT_LICZBA_ELEMENTOW       1006
@@ -42,6 +49,9 @@
 #define IDC_STATIC_ZAGESC               1008
 #define IDC_STATIC_KROTNIE              1009
 #define IDC_STATIC_ROZKLAD_TEMP         1018
+#define IDC_RADIO2                      1025
+#define IDC_RADIO1                      1026
+#define IDC_RADIO4                      1030
 #define ID_SIATKA_USTAWIENIA            32771
 #define ID_OBLICZENIA_USTAWIENIA        32772
 #define ID_OBLICZENIA_WYKONAJ           32773
@@ -58,7 +68,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        316
 #define _APS_NEXT_COMMAND_VALUE         32792
-#define _APS_NEXT_CONTROL_VALUE         1023
-#define _APS_NEXT_SYMED_VALUE           322
+#define _APS_NEXT_CONTROL_VALUE         1033
+#define _APS_NEXT_SYMED_VALUE           333
 #endif
 #endif

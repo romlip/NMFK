@@ -1,4 +1,4 @@
-
+﻿
 // RAMESView.cpp : implementation of the CRAMESView class
 //
 
@@ -86,22 +86,23 @@ void CRAMESView::OnDraw(CDC* pDC)
 	if (pDoc->bDaneFlag) // jesli dane sa wczytane
 	{
 		//ustaw granice rysowania w oknie
-		CRect prostokatOkna;
-		GetWindowRect(prostokatOkna);
-		xc = prostokatOkna.Width() - xp;
-		yc = yp + xp;
-
+		GetWindowRect(rectOkna);
+		xc = rectOkna.Width() - xp;
+		yc = yp + 80;
+		int odstepStrukturaWykres = 80;
 		//okreslenie wielkosci obszarow do rysowania obiektow
 		rectStruktura = CRect(xp, yp, xc, yc);
-		rectWykres = CRect(xp, yc + 100, xc, prostokatOkna.Height() - yp);
+		rectWykres = CRect(xp, yc + odstepStrukturaWykres, xc, rectOkna.Height() - 50);
 
-		//ycWykres = prostokatOkna.Height() - yp;
+		//ycWykres = rectOkna.Height() - yp;
 		//ypWykres = yc + 100;
 
 		//pobierz xmin i xmax do rysowania struktury
 		xMinStrukt = pDoc->mDane.PobierzSiatke()->PobierzXmin();
 		xMaxStrukt = pDoc->mDane.PobierzSiatke()->PobierzXmax();
 		skalaX = (xc - xp) / (xMaxStrukt - xMinStrukt);
+
+		RysujInfo();
 
 		if (pDoc->bObliczeniaFlag) // jesli obliczenia zostaly wykonane
 		{
@@ -266,10 +267,15 @@ void CRAMESView::OnWynikiUstawienia()
 
 	if (result == IDOK)
 	{
-		pDoc->mObliczenia.UstawWynikiTylkoWezly(dlgWynikiUstawienia.mRadioWyniki);
-		pDoc->mObliczenia.UstawWynikiGestoscAproksymacji(dlgWynikiUstawienia.mEditGestoscAproksymacji);
+		pDoc->mObliczenia.UstawWynikiCzyZakres(dlgWynikiUstawienia.mRadioZakres);
+		pDoc->mObliczenia.UstawWynikiZakres(dlgWynikiUstawienia.mEditZakresOd, dlgWynikiUstawienia.mEditZakresDo);
 
-		Invalidate();
+		pDoc->mObliczenia.UstawWynikiRozklad(dlgWynikiUstawienia.mRadioRozklad);
+		pDoc->mObliczenia.UstawWynikiGestoscAproksymacji(dlgWynikiUstawienia.mEditRozkladGestoscAproksymacji);
+		pDoc->mObliczenia.UstawWynikiLiczbaPunktow(dlgWynikiUstawienia.mEditRozkladLiczbaPunktow);
+		pDoc->mObliczenia.UstawWynikiStalyKrok(dlgWynikiUstawienia.mEditRozkladStalyKrok);
+
+		//Invalidate();
 	}
 }
 
@@ -406,8 +412,18 @@ void CRAMESView::RysujOsie()
 	mpDC->LineTo(xp + szerokoscStrzalki, ypWykres + dlugoscStrzalki);
 }
 
-void CRAMESView::OznaczOsie()
+void CRAMESView::RysujInfo()
 {
+	CString nazwa(pDoc->mPlik.PobierzNazwe()->c_str());
+	CString elementyInfo, wezlyInfo;
+	elementyInfo.Format(_T("Liczba elementow %d-wezlowych: %d "),pDoc->mDane.PobierzSiatke()->PobierzLiczbeWezlowWelemencie(), pDoc->mDane.PobierzSiatke()->PobierzElementy()->size());
+	wezlyInfo.Format(_T("Liczba wezlow: %d"), pDoc->mDane.PobierzSiatke()->PobierzWezly()->size());
+	int xInfo, yInfo, odstepY = 5;
+	xInfo = 10;
+	yInfo = 10;
+	mpDC->TextOut(xInfo, yInfo, nazwa);
+	mpDC->TextOut(xInfo, yInfo + mpDC->GetTextExtent(nazwa).cy + odstepY, elementyInfo);
+	mpDC->TextOut(xInfo, yInfo + +mpDC->GetTextExtent(nazwa).cy + mpDC->GetTextExtent(elementyInfo).cy + 2* odstepY, wezlyInfo);
 }
 
 void CRAMESView::RysujSkaleGradientu()
@@ -464,7 +480,6 @@ void CRAMESView::OznaczOsY(CRect& rect)
 	mpDC->TextOut(rect.TopLeft().x - mpDC->GetTextExtent(strOsT).cx - podpisOffset, rect.Height()/ 2 + rect.TopLeft().y, strOsT);
 }
 //////////////////////////////
-
 
 //for (int i(0); i <= 510; i++)
 //{

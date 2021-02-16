@@ -36,7 +36,7 @@ public:
 	void UstawDane(KDane* pDane);
 	int WczytajDane(char* inazwaPliku, KDane* dane);
 	void ZapiszWynik(const KObliczenia* obliczenia, const char* inazwaPliku = "");
-
+	std::string* PobierzNazwe();
 	void Inicjalizuj();
 };
 

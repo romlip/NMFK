@@ -22,15 +22,13 @@ public:
 
 	void UstawNumer(unsigned inumer);
 	void UstawWezel(int i, KWezel1D* wezel);
-	static short int PobierzLiczbeWezlow();
-
-
-	std::vector<KWezel1D*>* PobierzWezly();
-	KWezel1D* PobierzWezel(int ity_wezel);
-	unsigned PobierzNumer();
-	double Pobierzh();
-	double Pobierzk();
-	double Pobierzf();
-	double PobierzT();
+	inline static short int PobierzLiczbeWezlow() { return n; };
+	std::vector<KWezel1D*>* PobierzWezly() { return &vpWezly; };
+	KWezel1D* PobierzWezel(int ity_wezel) const { return vpWezly[ity_wezel - 1]; };
+	inline unsigned PobierzNumer() const { return n; };
+	inline double Pobierzh() const { return (*(vpWezly.end() - 1))->PobierzX() - (*(vpWezly.begin()))->PobierzX(); };
+	inline double Pobierzk() const { return k; };
+	inline double Pobierzf() const { return f; };
+	//inline double PobierzT() const { return 0; };
 };
 

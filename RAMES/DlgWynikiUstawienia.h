@@ -1,5 +1,6 @@
 #pragma once
 
+#include "RAMESDoc.h"
 
 // DlgWynikiUstawienia dialog
 
@@ -22,8 +23,21 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
-	CButton mCtrlRadioTylkoWezly;
-	CButton mCtrlRadioAproksymacja;
-	int mEditGestoscAproksymacji;
-	int mRadioWyniki;
+
+	CButton mCtrlRadioZakres;
+	int mRadioZakres;
+	double mEditZakresOd;
+	double mEditZakresDo;
+
+	CButton mCtrlRadioRozklad;
+	int mRadioRozklad;
+	int mEditRozkladGestoscAproksymacji;
+	unsigned mEditRozkladLiczbaPunktow;
+	double mEditRozkladStalyKrok;
+
+private:
+	CRAMESDoc* pDoc;
+	double mdXmin, mdXmax;
+	double mdWynikiXmin, mdWynikiXmax;
+
 };

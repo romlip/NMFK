@@ -281,49 +281,9 @@ void KSiatka::Generuj()
     NumerujWezly();
 }
 
-int KSiatka::PobierzLiczbeWezlowWelemencie()
-{
-    return liczba_wezlow_w_elemencie;
-}
-
-KWezel1D* KSiatka::PobierzWezel(unsigned nrwezla)
-{
-    return *(vpWezly.begin() + nrwezla - 1);
-}
-
-std::vector<KWezel1D*>* KSiatka::PobierzWezly()
-{
-    return &vpWezly;
-}
-
-std::vector<KWezel1D*>* KSiatka::PobierzWezlyWczytane()
-{
-    return &vpWezly_wczytane;
-}
-
-std::vector<KElement1D>* KSiatka::PobierzStrukture()
-{
-    return &vStruktura;
-}
-
-std::vector<KElement1D>* KSiatka::PobierzElementy()
-{
-    return &vElementy;
-}
-
-std::vector<strukt_zrodlo_punktowe>* KSiatka::PobierzZrodlaPunktowe()
-{
-    return &mvPunktyZrodlowe;
-}
-
 ////////////////////////////////////////////////////////
 // Do wczytanej z pliku struktury dodaje punkty zrodlowe
 // i konieczne elementy
-
-void KSiatka::UstawLiczbeWezlowWelemencie(int iliczba_wezlow)
-{
-    liczba_wezlow_w_elemencie = iliczba_wezlow;
-}
 
 void KSiatka::UstawXmin(double iXmin)
 {
@@ -343,16 +303,6 @@ void KSiatka::UstawZageszczanieWstepne(bool czy)
 void KSiatka::UstawKrotnoscZageszczenia(unsigned krotnosc)
 {
     muKrotnoscZageszczenia = krotnosc;
-}
-
-double KSiatka::PobierzXmin()
-{
-    return mfXmin;
-}
-
-double KSiatka::PobierzXmax()
-{
-    return mfXmax;
 }
 
 void KSiatka::NumerujWezly()

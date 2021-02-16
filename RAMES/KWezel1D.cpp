@@ -23,14 +23,3 @@ void KWezel1D::UstawNumer(unsigned inumer)
 void KWezel1D::UstawTemperature(double itemp) {
 	temperatura = itemp;
 }
-
-unsigned KWezel1D::PobierzNumer()
-{
-	return numer;
-}
-double KWezel1D::PobierzTemperature() {
-	return temperatura;
-}
-double KWezel1D::PobierzX() {
-	return x;
-}

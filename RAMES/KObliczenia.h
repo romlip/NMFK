@@ -9,9 +9,6 @@
 #include "KElement1D.h"
 #include <iomanip>
 
-#define TYLKO_WEZLY FALSE
-#define GESTOSC_APROKSYMACJI 6
-
 enum class EwarunkiI { REDUKCJA = 0, ANALITYCZNE2 = 1, PAYNE_IRONS = 2 };
 
 class KObliczenia
@@ -19,9 +16,12 @@ class KObliczenia
 
 private:
 	int mWyniki;
-	int mGestoscAproksymacji;
+	unsigned mGestoscAproksymacji;
 	double mfTmin, mfTmax;
-
+	bool mbWynikiCzyZakres;
+	unsigned mWynikiLiczbaPunktow;
+	double mWynikiZakresMin, mWynikiZakresMax;
+	double mWynikiStalyKrok;
 	EwarunkiI eWarunkiI;
 	KDane* pDane;
 	KUkladRownan mUrMES;
@@ -47,14 +47,17 @@ private:
 
 	void UstawFormatWynikow(std::ostream& stream) const;
 
-
 public:
 	KObliczenia();
 	~KObliczenia();
 
 	void UstawUwzglednianieWarunkowI(int uwzglednianieWarunkowI);
-	void UstawWynikiTylkoWezly(int wyniki);
+	void UstawWynikiRozklad(int wyniki);
 	void UstawWynikiGestoscAproksymacji(int gestosc);
+	void UstawWynikiCzyZakres(bool calyZakres);
+	void UstawWynikiZakres(double zakresMin, double zakresMax);
+	void UstawWynikiLiczbaPunktow(unsigned liczbaPunktow);
+	void UstawWynikiStalyKrok(double krok);
 
 	KDane* PobierzDane();
 	KUkladRownan* PobierzUkladRownan();
@@ -66,4 +69,6 @@ public:
 	inline double PobierzTmax() const { return mfTmax; };
 	int Licz(KDane* idane);
 	void WypiszWynik(std::ostream& iplik) const;
+
+	void KObliczenia::WynikiAproksymuj(unsigned gestosc, std::ostream& iplik) const;
 };
