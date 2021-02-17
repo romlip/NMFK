@@ -167,6 +167,9 @@ void CRAMESDoc::OnDaneWczytaj()
 			ClearFlags();
 			bDaneFlag = true;
 		}
+		else
+			ClearFlags();
+
 		UpdateAllViews(NULL);
 	}
 }

@@ -39,8 +39,7 @@ public:
 	void AktualizujSiatkaInfo();
 	afx_msg void OnCbnSelchangeComboMetodaRozwiazaniaUr();
 	afx_msg void OnBnClickedButtonGeneruj();
-	void InicjalizujRadioLiczbaWezlow();
-	void InicjalizujEditKrotnoscZageszczenia();
+	void InicjalizujDaneGeneracji();
 	BOOL mbCheckZagescXkrotnie;
 	int mRadioLiczbaWezlow;
 };

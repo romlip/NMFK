@@ -293,8 +293,14 @@ int KObliczenia::Licz(KDane* idane)
 	pDane = idane;
 	//pDane->PobierzSiatke()->Generuj();
 
+	//wyczysc temperature wezlow i ustaw temperature warunkow I rodzaju
+	for (auto it_pw = pDane->PobierzSiatke()->PobierzWezly()->begin(); it_pw != pDane->PobierzSiatke()->PobierzWezly()->end(); ++it_pw)
+		(*it_pw)->UstawTemperature(-1);
+	for (auto it_wI = pDane->PobierzWarunkiI()->begin(); it_wI != pDane->PobierzWarunkiI()->end(); ++it_wI)
+		it_wI->pw->UstawTemperature(it_wI->T);
+
 	unsigned il_warunkow_I = (unsigned)pDane->PobierzWarunkiI()->size();
-	unsigned rozmiar = (unsigned)pDane->PobierzSiatke()->vpWezly.size();
+	unsigned rozmiar = (unsigned)pDane->PobierzSiatke()->PobierzWezly()->size();
 
 	// tworzenie i wypelnianie ukladu rownan
 	if (eWarunkiI == EwarunkiI::REDUKCJA)
@@ -334,7 +340,8 @@ int KObliczenia::Licz(KDane* idane)
 	// rozwiaz uklad rownan
 	mUrMES.Rozwiaz();
 	UstawTemperatureWezlow();
-	//pDane->OdstosujSkale();
+	mWynikiZakresMax = pDane->PobierzSiatke()->PobierzXmax();
+	mWynikiZakresMin = pDane->PobierzSiatke()->PobierzXmin();
 
 	return 0;
 }

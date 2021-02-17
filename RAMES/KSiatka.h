@@ -19,7 +19,7 @@ private:
 	bool mbWygenerowano;
 	int liczba_wezlow_w_elemencie; //liczba wezlow w elemencie
 	const double mfWspolczynnikZageszczania = 3;
-	bool mbZagescWstepnie;
+	bool mbZagescWstepnie, mbZagescXkrotnie;
 	unsigned muKrotnoscZageszczenia;
 	double mfXmin, mfXmax;
 	double mfTmin, mfTmax;
@@ -53,7 +53,7 @@ public:
 	void UstawXmax(double iXmax);
 	void UstawZageszczanieWstepne(bool czy);
 	void UstawKrotnoscZageszczenia(unsigned krotnosc);
-
+	void UstawCzyZagescXkrotnie(unsigned czyZagescicXkrotnie);
 
 	void NumerujWezly();
 	KWezel1D* WezelIstnieje(double x_wezla, const std::vector<KWezel1D*>& vpW);
@@ -77,6 +77,8 @@ public:
 	inline std::vector<KElement1D>* PobierzElementy() { return &vElementy; };
 	inline std::vector<strukt_zrodlo_punktowe>* PobierzZrodlaPunktowe() { return &mvPunktyZrodlowe; };
 	inline unsigned PobierzKrotnoscZageszczenia() { return muKrotnoscZageszczenia; };
+	inline unsigned PobierzCzyZagescWstepnie() { return mbZagescWstepnie; };
+	inline unsigned PobierzCzyZagescXkrotnie() { return mbZagescXkrotnie; };
 
 	void Wyczysc();
 

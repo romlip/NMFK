@@ -78,6 +78,8 @@ private:
 	void RysujSkaleGradientu();
 	void OznaczOsX(CRect& rect);
 	void OznaczOsY(CRect& rect);
+	void UstawZakresT();
+	void UstawZakresT(double* tArray);
 	void Ramka(const CRect& rect, const CPen& pen);
 	void RysujGradientTemperatury();
 	COLORREF KonwertujTnaGradient(double t, double tMin, double tMax);

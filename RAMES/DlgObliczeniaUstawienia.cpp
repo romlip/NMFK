@@ -14,7 +14,7 @@ DlgObliczeniaUstawienia::DlgObliczeniaUstawienia(CWnd* pParent /*=nullptr*/)
 	: CDialog(IDD_DIALOG_OBLICZENIA_USTAWIENIA, pParent)
 	, mbCheckZagescWstepnie(TRUE)
 	, mKrotnoscZageszczenia(1)
-	, mComboBoxWarunkiSelection(2) // Payne-Ironsa domyslna metoda
+	, mComboBoxWarunkiSelection(1) // Payne-Ironsa domyslna metoda
 	, mComboRozwiazanieUrSelection(0)
 	, mbCheckZagescXkrotnie(TRUE)
 	, mRadioLiczbaWezlow(0)
@@ -63,8 +63,7 @@ BOOL DlgObliczeniaUstawienia::OnInitDialog()
 	pDoc = (CRAMESDoc*)(((CFrameWnd*)AfxGetMainWnd())->GetActiveView()->GetDocument());
 
 	InicjalizujComboBoxy();
-	InicjalizujRadioLiczbaWezlow();
-	InicjalizujEditKrotnoscZageszczenia();
+	InicjalizujDaneGeneracji();
 	UpdateData(FALSE); // inicjalizuj kontrolki wartosciami poczatkowymi
 
 	AktualizujSiatkaInfo();
@@ -77,9 +76,9 @@ void DlgObliczeniaUstawienia::InicjalizujComboBoxy()
 {
 	//ComboBox Warunki I
 	mComboBoxCtrl.InsertString(0, _T("Redukcja układu"));
-	mComboBoxCtrl.InsertString(1, _T("Analityczne (nie działa)"));
-	mComboBoxCtrl.InsertString(2, _T("Payne'a-Irons'a"));
-	mComboBoxWarunkiSelection = 2;
+	//mComboBoxCtrl.InsertString(1, _T("Analityczne (nie działa)"));
+	mComboBoxCtrl.InsertString(1, _T("Payne'a-Irons'a"));
+	mComboBoxWarunkiSelection = 1;
 
 	// ComboBox metoda rozwiazania ukladu rownan
 	mComboBoxRozwiazanieUr.InsertString(0, _T("Rozkład Cholesky'ego (dokładna)"));
@@ -102,8 +101,7 @@ void DlgObliczeniaUstawienia::OnBnClickedButtonGeneruj()
 	pDoc->mDane.PobierzSiatke()->UstawZageszczanieWstepne(mbCheckZagescWstepnie);
 	if(mbCheckZagescXkrotnie)
 		pDoc->mDane.PobierzSiatke()->UstawKrotnoscZageszczenia(mKrotnoscZageszczenia);
-	else
-		pDoc->mDane.PobierzSiatke()->UstawKrotnoscZageszczenia(0);
+	pDoc->mDane.PobierzSiatke()->UstawCzyZagescXkrotnie(mbCheckZagescXkrotnie);
 	pDoc->mDane.PobierzSiatke()->Generuj();
 	pDoc->mDane.DodajWezlyWarunkowBrzegowych();
 
@@ -114,14 +112,12 @@ void DlgObliczeniaUstawienia::OnBnClickedButtonGeneruj()
 	// TODO: Add your control notification handler code here
 }
 
-void DlgObliczeniaUstawienia::InicjalizujRadioLiczbaWezlow()
+void DlgObliczeniaUstawienia::InicjalizujDaneGeneracji()
 {
 	pDoc = (CRAMESDoc*)(((CFrameWnd*)AfxGetMainWnd())->GetActiveView()->GetDocument());
-	mRadioLiczbaWezlow = pDoc->mDane.PobierzSiatke()->PobierzLiczbeWezlowWelemencie() - 2;
-}
 
-void DlgObliczeniaUstawienia::InicjalizujEditKrotnoscZageszczenia()
-{
-	pDoc = (CRAMESDoc*)(((CFrameWnd*)AfxGetMainWnd())->GetActiveView()->GetDocument());
-	mLiczbaWezlow = pDoc->mDane.PobierzSiatke()->PobierzKrotnoscZageszczenia();
+	mRadioLiczbaWezlow = pDoc->mDane.PobierzSiatke()->PobierzLiczbeWezlowWelemencie() - 2;
+	mbCheckZagescWstepnie = pDoc->mDane.PobierzSiatke()->PobierzCzyZagescWstepnie();
+	mbCheckZagescXkrotnie = pDoc->mDane.PobierzSiatke()->PobierzCzyZagescXkrotnie();
+	mKrotnoscZageszczenia = pDoc->mDane.PobierzSiatke()->PobierzKrotnoscZageszczenia();
 }

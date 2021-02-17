@@ -91,7 +91,7 @@ int KPlik::WczytajDane(char* inazwaPliku, KDane* pDane)
 	catch (exception& e)
 	{
 		MessageBox(NULL, CString(e.what()), _T("Blad wczytywania danych"), MB_OK | MB_ICONWARNING);
-		mpDane->mDaneFlag = false;
+		return 1;
 	}
 
 	mPlik.close();

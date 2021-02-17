@@ -162,13 +162,7 @@ KWektorK* KUkladRownan::RozwiazCholesky()
 	if (!A->DodatnioOkreslona()) // uzupelnic funkcje
 		throw runtime_error("macierz nie jest dodatnio okreslona");
 
-	ofstream plik("K.txt");
-	plik << "A przed ccholeskym\n";
-	A->Wypisz(plik);
 	A->RozlozCholeskySelf(); // A <- L + L^T
-
-	plik << "\nA po cholesky ccholeskym\n";
-	A->Wypisz(plik);
 
 	unsigned m = A->DajM();
 	KWektorK Y(m);
@@ -177,16 +171,9 @@ KWektorK* KUkladRownan::RozwiazCholesky()
 	KUkladRownan Ly_b(A, &Y, B);
 	Ly_b.RozwiazEliminacja(0);
 
-	plik << "\nY po pierwszej\n";
-	Y.Wypisz(plik);
-
 	// Rozwiazujemy LT * X = Y ;
 	KUkladRownan LTx_y(A, X, &Y);
 	LTx_y.RozwiazEliminacja(1);
-
-
-	plik << "\nY po drugiej\n";
-	Y.Wypisz(plik);
 
 	return X;
 }

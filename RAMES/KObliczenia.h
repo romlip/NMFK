@@ -9,7 +9,7 @@
 #include "KElement1D.h"
 #include <iomanip>
 
-enum class EwarunkiI { REDUKCJA = 0, ANALITYCZNE2 = 1, PAYNE_IRONS = 2 };
+enum class EwarunkiI { REDUKCJA = 0, PAYNE_IRONS = 1 };
 
 class KObliczenia
 {

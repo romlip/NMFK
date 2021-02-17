@@ -145,15 +145,16 @@ void KSiatka::ZagescWstepnie()
                     KWezel1D* pNowyWezel = DodajWezel(it_e->PobierzWezel(1)->PobierzX() + it_e->Pobierzh() / 2.);
                     WstawElementZa(pNowyWezel);
                     bWstawiono = true;
+                    break;
                 }
                 else if (mfWspolczynnikZageszczania * it_e->Pobierzh() < (it_e + 1)->Pobierzh())
                 {
                     KWezel1D* pNowyWezel = DodajWezel((it_e + 1)->PobierzWezel(1)->PobierzX() + (it_e + 1)->Pobierzh() / 2.);
                     WstawElementZa(pNowyWezel);
                     bWstawiono = true;
-                }
-                if (bWstawiono)
                     break;
+                }
+
             }
         } while (bWstawiono);
     }
@@ -170,14 +171,17 @@ void KSiatka::Finalizuj()
 
 void KSiatka::Zagesc()
 {
-    for (unsigned i(0); i < muKrotnoscZageszczenia; ++i)
+    if (mbZagescXkrotnie)
     {
-        unsigned liczbaElementow = vElementy.size();
-        for (unsigned j(0); j < liczbaElementow; ++j)
+        for (unsigned i(0); i < muKrotnoscZageszczenia; ++i)
         {
-            auto it_e = vElementy.begin() + 2 * j;
-            KWezel1D* pNowyWezel = DodajWezel(it_e->PobierzWezel(1)->PobierzX() + it_e->Pobierzh() / 2.);
-            WstawElementZa(pNowyWezel);
+            unsigned liczbaElementow = vElementy.size();
+            for (unsigned j(0); j < liczbaElementow; ++j)
+            {
+                auto it_e = vElementy.begin() + 2 * j;
+                KWezel1D* pNowyWezel = DodajWezel(it_e->PobierzWezel(1)->PobierzX() + it_e->Pobierzh() / 2.);
+                WstawElementZa(pNowyWezel);
+            }
         }
     }
 }
@@ -305,15 +309,21 @@ void KSiatka::UstawKrotnoscZageszczenia(unsigned krotnosc)
     muKrotnoscZageszczenia = krotnosc;
 }
 
+
+void KSiatka::UstawCzyZagescXkrotnie(unsigned czyZagescicXkrotnie)
+{
+    mbZagescXkrotnie = czyZagescicXkrotnie;
+}
+
 void KSiatka::NumerujWezly()
 {
     sort(vpWezly.begin(), vpWezly.end(), [](KWezel1D* const& a, KWezel1D* const& b) { return a->PobierzX() < b->PobierzX(); }); // posortuj wektor wezlow po x
 
     // ustaw numery wezlow w kolejnosci x
     int i = 1;
-    for (auto it_w : vpWezly)
+    for (auto it_w = vpWezly.begin(); it_w != vpWezly.end(); ++it_w)
     {
-        it_w->UstawNumer(i);
+        (*it_w)->UstawNumer(i);
         i++;
     }
 }

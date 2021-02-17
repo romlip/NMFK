@@ -160,7 +160,7 @@ void KDane::SprawdzPoprawnoscDanych()
 	//sprawdz spojnosc obszarow
 	for (auto it_e = mSiatka.PobierzElementy()->begin(); it_e + 1 != mSiatka.PobierzElementy()->end(); ++it_e)
 	{
-		if ((it_e + 1)->PobierzWezel(1)->PobierzX() != (it_e)->PobierzWezel(2)->PobierzX())
+		if ((*(it_e + 1)->PobierzWezly()->begin())->PobierzX() != (*((it_e)->PobierzWezly()->end()-1))->PobierzX())
 		{
 			char komunikat[50];
 			sprintf_s(komunikat, "Obszary %d i %d nie sa spojne.", it_e->PobierzNumer(), (it_e + 1)->PobierzNumer());

@@ -94,9 +94,6 @@ void CRAMESView::OnDraw(CDC* pDC)
 		rectStruktura = CRect(xp, yp, xc, yc);
 		rectWykres = CRect(xp, yc + odstepStrukturaWykres, xc, rectOkna.Height() - 50);
 
-		//ycWykres = rectOkna.Height() - yp;
-		//ypWykres = yc + 100;
-
 		//pobierz xmin i xmax do rysowania struktury
 		xMinStrukt = pDoc->mDane.PobierzSiatke()->PobierzXmin();
 		xMaxStrukt = pDoc->mDane.PobierzSiatke()->PobierzXmax();
@@ -111,8 +108,7 @@ void CRAMESView::OnDraw(CDC* pDC)
 			liczbaPikseliY = yc - yp + 1;
 			tArray = new double[liczbaPikseliX]; // tblica z wartosciami temperatury w osi X do rysowania
 			pDoc->mObliczenia.WyznaczTwZakresie(xMinStrukt, xMaxStrukt, liczbaPikseliX, tArray);
-			Tmin = pDoc->mObliczenia.PobierzTmin();
-			Tmax = pDoc->mObliczenia.PobierzTmax();
+			UstawZakresT();
 
 			RysujGradientTemperatury();
 			RysujWykres();
@@ -235,6 +231,7 @@ void CRAMESView::OnObliczeniaUstawienia()
 	if (result == IDOK)
 	{
 		pDoc->mObliczenia.UstawUwzglednianieWarunkowI(dlgObliczeniaUstawienia.mComboBoxWarunkiSelection);
+		pDoc->bObliczeniaFlag = false;
 		Invalidate();
 	}
 }
@@ -479,6 +476,19 @@ void CRAMESView::OznaczOsY(CRect& rect)
 	mpDC->TextOut(rect.TopLeft().x - mpDC->GetTextExtent(strTmax).cx - podpisOffset, rect.TopLeft().y - mpDC->GetTextExtent(strTmax).cy / 2, strTmax);
 	mpDC->TextOut(rect.TopLeft().x - mpDC->GetTextExtent(strOsT).cx - podpisOffset, rect.Height()/ 2 + rect.TopLeft().y, strOsT);
 }
+
+void CRAMESView::UstawZakresT()
+{
+	Tmin = tArray[0];
+	Tmax = Tmin;
+
+	for (int i(0); i < liczbaPikseliX; ++i)
+	{
+		if (tArray[i] < Tmin) Tmin = tArray[i];
+		else if (tArray[i] > Tmax) Tmax = tArray[i];
+	}
+}
+
 //////////////////////////////
 
 //for (int i(0); i <= 510; i++)
