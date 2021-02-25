@@ -135,26 +135,22 @@ void KSiatka::ZagescWstepnie()
     if (mbZagescWstepnie)
     {
         bool bWstawiono;
-        do
-        {
+        do {
             bWstawiono = false;
             for (auto it_e = vElementy.begin(); (it_e + 1) != vElementy.end(); ++it_e)
             {
-                if (it_e->Pobierzh() > mfWspolczynnikZageszczania * (it_e + 1)->Pobierzh())
-                {
+                if (it_e->Pobierzh() > mfWspolczynnikZageszczania * (it_e + 1)->Pobierzh()){
                     KWezel1D* pNowyWezel = DodajWezel(it_e->PobierzWezel(1)->PobierzX() + it_e->Pobierzh() / 2.);
                     WstawElementZa(pNowyWezel);
                     bWstawiono = true;
                     break;
                 }
-                else if (mfWspolczynnikZageszczania * it_e->Pobierzh() < (it_e + 1)->Pobierzh())
-                {
+                else if (mfWspolczynnikZageszczania * it_e->Pobierzh() < (it_e + 1)->Pobierzh()){
                     KWezel1D* pNowyWezel = DodajWezel((it_e + 1)->PobierzWezel(1)->PobierzX() + (it_e + 1)->Pobierzh() / 2.);
                     WstawElementZa(pNowyWezel);
                     bWstawiono = true;
                     break;
                 }
-
             }
         } while (bWstawiono);
     }

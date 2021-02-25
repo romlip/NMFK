@@ -155,19 +155,15 @@ KMacierzSPF KMacierzSPF::T() const
 void KMacierzSPF::RozlozCholeskySelf()
 {
     double suma;
-    for (unsigned i(1); i <= m; ++i)
-    {
-        for (unsigned j = 1; j <= i; ++j)
-        {
+    for (unsigned i(1); i <= m; ++i){
+        for (unsigned j = 1; j <= i; ++j){
             suma = 0;
-            if (i == j)
-            {
+            if (i == j){
                 for (unsigned k = (i - mPasmo+1 > 0 ? i - mPasmo+1 : 1); k <= j - 1; ++k)
                     suma += (*this)(i, k) * (*this)(i, k);
                 (*this)(i, i) = sqrt((*this)(i, i) - suma);
             }
-            else // j < i
-            {
+            else { // j < i
                 for (unsigned k = (j - mPasmo + 1 > 0 ? j - mPasmo+1 : 1); k <= j - 1; ++k)
                     suma += (*this)(i, k) * (*this)(j, k);
                 (*this)(i, j) = 1 / (*this)(j, j) * ((*this)(i, j) - suma);

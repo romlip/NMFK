@@ -9,6 +9,8 @@
 class KUkladRownan
 {
 private:
+	enum class eEliminacja { DOLNA = 0, GORNA = 1 };
+
 	KMacierz* A; //macierz wspolczynnikow
 	KWektorK* B; // wektor wyrazow wolnych
 	KWektorK* X; // wektor niewiadomych
@@ -16,7 +18,9 @@ private:
 	KWektorK* RozwiazGradientamiSprzezonymi();
 	KWektorK* RozwiazNadrelaksacja();
 	KWektorK* RozwiazCholesky();
-	KWektorK* RozwiazEliminacja(int gorna_dolna);
+	KWektorK* RozwiazEliminacja(eEliminacja eGornaDolna);
+
+
 
 public:
 

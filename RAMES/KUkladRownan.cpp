@@ -169,37 +169,37 @@ KWektorK* KUkladRownan::RozwiazCholesky()
 
 	// Rozwiazujemy uklad L * Y = B
 	KUkladRownan Ly_b(A, &Y, B);
-	Ly_b.RozwiazEliminacja(0);
+	Ly_b.RozwiazEliminacja(eEliminacja::DOLNA);
 
 	// Rozwiazujemy LT * X = Y ;
 	KUkladRownan LTx_y(A, X, &Y);
-	LTx_y.RozwiazEliminacja(1);
+	LTx_y.RozwiazEliminacja(eEliminacja::GORNA);
 
 	return X;
 }
 
-KWektorK* KUkladRownan::RozwiazEliminacja(int gorna_dolna)
+KWektorK* KUkladRownan::RozwiazEliminacja(eEliminacja eGornaDolna)
 {
 	double suma;
 	unsigned promienPasma = (A->PobierzPasmo() + 1) / 2;
-	if (gorna_dolna == 0)
-	{
-		for (unsigned i(1); i <= A->DajM(); ++i)
-		{
-			suma = 0;
-			for (unsigned j = (i - promienPasma + 1 > 0 ? i - promienPasma + 1 : 1); j <= i - 1; ++j)
-				suma += (*X)(j) * (*A)(i, j);
-			(*X)(i) = ((*B)(i) - suma) / (*A)(i, i);
+	switch (eGornaDolna) {
+		case eEliminacja::DOLNA: {
+			for (unsigned i(1); i <= A->DajM(); ++i) {
+				suma = 0;
+				for (unsigned j = (i - promienPasma + 1 > 0 ? i - promienPasma + 1 : 1); j <= i - 1; ++j)
+					suma += (*X)(j) * (*A)(i, j);
+				(*X)(i) = ((*B)(i) - suma) / (*A)(i, i);
+			}
+			break;
 		}
-	}
-	else
-	{
-		for (unsigned i(A->DajM()); i >=1 ; --i)
-		{
-			suma = 0;
-			for (unsigned j = (i + promienPasma -1 <= A->DajM() ? i + promienPasma - 1 : A->DajM()); j >= i + 1; --j)
-				suma += (*X)(j) * (*A)(i, j);
-			(*X)(i) = ((*B)(i) - suma) / (*A)(i, i);
+		case eEliminacja::GORNA: {
+			for (unsigned i(A->DajM()); i >= 1; --i) {
+				suma = 0;
+				for (unsigned j = (i + promienPasma - 1 <= A->DajM() ? i + promienPasma - 1 : A->DajM()); j >= i + 1; --j)
+					suma += (*X)(j) * (*A)(i, j);
+				(*X)(i) = ((*B)(i) - suma) / (*A)(i, i);
+			}
+			break;
 		}
 	}
 	return X;
