@@ -19,7 +19,7 @@ To build this project, run in Visual Studio commmand line:
 > msbuild RAMES.sln
 ```
 
-##Features
+## Features
 - Calculate temperature distribution across given structure
 - Visualize results both as temperature gradient and graph of temperature vs position
 - Output results to txt file in form of position - temperature
