@@ -32,4 +32,5 @@ TO DO:
 - Non-uniform grid generator
 - Iterative method of solving linear systems
 - Computation time display
+- Translation of files, classes, methods to english
 - Code clean up
